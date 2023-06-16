@@ -63,6 +63,29 @@ namespace StoreBack.Controllers
             }
         }
 
+        //getbarcodes
+
+        [HttpGet("{barcodetext}")]
+        [Authorize]
+        [Role("operator")]
+        public async Task<IActionResult> GetBarcode(string barcodetext)
+        {
+            if (string.IsNullOrEmpty(barcodetext))
+            {
+                return BadRequest("Invalid barcode text");
+            }
+
+            var barcode = _GoodsinRepository.getBarcode(barcodetext);
+
+            if (barcode == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(barcode);
+        }
+
+
 
 
 

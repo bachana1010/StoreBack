@@ -62,7 +62,9 @@ namespace StoreBack.Repositories
                             PasswordHash = reader.GetString(reader.GetOrdinal("PasswordHash")),
                             Role = reader.GetString(reader.GetOrdinal("Role")),
                             OrganizationId = reader.GetInt32(reader.GetOrdinal("OrganizationId")),
-                            BranchId = reader.GetInt32(reader.GetOrdinal("BranchId"))
+                            BranchId = reader.IsDBNull(reader.GetOrdinal("BranchId")) ? 
+                                (int?)null : 
+                                reader.GetInt32(reader.GetOrdinal("BranchId"))
 
                             // fill out other properties if necessary
                         };
