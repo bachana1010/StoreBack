@@ -80,11 +80,16 @@ builder.Services.AddSwaggerGen(c =>
             }
         });
 });
+
+
 builder.Services.AddSingleton<IConfiguration>(builder.Configuration);
 builder.Services.AddScoped<IAuthRepository, AuthRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IBranchRepository, BranchRepository>();
 builder.Services.AddScoped<IGoodsinRepository, GoodsinRepository>();
+builder.Services.AddScoped<IGoodsOutRepository, GoodsOutRepository>();
+
+
 
 
 
