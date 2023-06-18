@@ -88,6 +88,9 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IBranchRepository, BranchRepository>();
 builder.Services.AddScoped<IGoodsinRepository, GoodsinRepository>();
 builder.Services.AddScoped<IGoodsOutRepository, GoodsOutRepository>();
+builder.Services.AddScoped<IProductRepository, ProductRepository>();
+
+
 
 
 
