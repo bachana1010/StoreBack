@@ -20,6 +20,7 @@ namespace StoreBack.Repositories
         // Task<List<User>> GetUsers( int OrganizationId);
         Task <int> MakeGoodsIn (MakeGoodsInViewModel model, User user);
         GetBarcodeViewModel getBarcode(string  barcodetext);
+        Task<List<GetGoodsinViewModel>> getGoodsin( int organizationId, int? branchId);
 
     }
     
@@ -110,8 +111,52 @@ namespace StoreBack.Repositories
         }
 
 
+        //goodsin list for manager
+
+
+
+        public async Task<List<GetGoodsinViewModel>> getGoodsin(int OrganizationId,int? branchId)
+        {
+            List<GetGoodsinViewModel> goodsinList = new List<GetGoodsinViewModel>();
+            using (SqlConnection conn = new SqlConnection(connection))
+            {
+                conn.Open();
+                SqlCommand cmd = new SqlCommand();
+                cmd.Connection = conn;
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.CommandText = "GetGoodsIn";
+
+                cmd.Parameters.Add("@OrganizationId", SqlDbType.Int).Value = OrganizationId;
+
+                if(branchId.HasValue)
+                {
+                    cmd.Parameters.Add("@branchId", SqlDbType.Int).Value = branchId.Value;
+                }
+
+                using (SqlDataReader reader = cmd.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        GetGoodsinViewModel goodsinVM = new GetGoodsinViewModel
+                        {
+                            Quantity = reader.GetFloat(reader.GetOrdinal("Quantity")),
+                            EntryDate = reader.GetDateTime(reader.GetOrdinal("EntryDate")),
+                            BranchName = reader.GetString(reader.GetOrdinal("BranchName")),
+                            OperatorUserName = reader.GetString(reader.GetOrdinal("OperatorUserName")),
+                            BarcodeName = reader.GetString(reader.GetOrdinal("BarcodeName"))
+                        };
+
+                        goodsinList.Add(goodsinVM);
+                    }
+                }
+            }
+            
+            return goodsinList;
+        }
 
 
 }
-
+                    
 }
+
+

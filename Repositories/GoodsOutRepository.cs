@@ -19,7 +19,7 @@ namespace StoreBack.Repositories
         // Task UpdateUser(int id, UpdateserViewModel model);
         // Task<List<User>> GetUsers( int OrganizationId);
         Task <int> MakeGoodsOut (MakeGoodsOutViewModel model, User user);
-        // GetBarcodeViewModel getBarcode(string  barcodetext);
+        Task<List<GetGoodsOutViewModel>> getGoodsOut( int organizationId, int? branchId);
 
     }
     
@@ -86,10 +86,54 @@ namespace StoreBack.Repositories
             }
 
 
-                
+
+            //goodsOut list for manager
+
+
+
+        public async Task<List<GetGoodsOutViewModel>> getGoodsOut(int OrganizationId,int? branchId)
+        {
+            List<GetGoodsOutViewModel> goodsOutList = new List<GetGoodsOutViewModel>();
+            using (SqlConnection conn = new SqlConnection(connection))
+            {
+                conn.Open();
+                SqlCommand cmd = new SqlCommand();
+                cmd.Connection = conn;
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.CommandText = "GetGoodsOut";
+
+                cmd.Parameters.Add("@OrganizationId", SqlDbType.Int).Value = OrganizationId;
+
+                if(branchId.HasValue)
+                {
+                    cmd.Parameters.Add("@branchId", SqlDbType.Int).Value = branchId.Value;
+                }
+
+                using (SqlDataReader reader = cmd.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        GetGoodsOutViewModel goodsOutVM = new GetGoodsOutViewModel
+                        {
+                            Quantity = reader.GetFloat(reader.GetOrdinal("Quantity")),
+                            OutDate = reader.GetDateTime(reader.GetOrdinal("OutDate")),
+                            BranchName = reader.GetString(reader.GetOrdinal("BranchName")),
+                            OperatorUserName = reader.GetString(reader.GetOrdinal("OperatorUserName")),
+                            BarcodeName = reader.GetString(reader.GetOrdinal("BarcodeName"))
+                        };
+
+                        goodsOutList.Add(goodsOutVM);
+                    }
+                }
             }
             
+            return goodsOutList;
         }
+
+                
+ }
+            
+}
 
 
 

@@ -65,7 +65,35 @@ namespace StoreBack.Controllers
             }
         }
 
-        
+           //getGoodOut
+        [HttpGet]
+        [Authorize]
+        [Role("manager")]
+        public async Task<IActionResult> GetGoodsOut()
+        {
+            var authUserIdString = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+              if (!int.TryParse(authUserIdString, out int authUserId))
+            {
+                return BadRequest("Invalid user ID");
+            }
+
+            var user = _userRepository.getUser(authUserId);
+            int? branchId = user.BranchId;
+            int? OrganizationId = user.OrganizationId;
+
+
+
+            var goodsIn = await _GoodsOutRepository.getGoodsOut(OrganizationId.Value, null);
+
+            if (goodsIn == null || !goodsIn.Any())
+            {
+                return NotFound();
+            }
+
+            return Ok(goodsIn);
+        }
+
+
 
 
 

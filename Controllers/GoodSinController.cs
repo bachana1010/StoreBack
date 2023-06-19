@@ -34,6 +34,7 @@ namespace StoreBack.Controllers
         [HttpPost("")]
         [Authorize]
         [Role("operator")]
+        
         public async Task<IActionResult> AddGoodSin([FromBody] MakeGoodsInViewModel model)
         {
             var authUserIdString = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
@@ -83,6 +84,35 @@ namespace StoreBack.Controllers
             }
 
             return Ok(barcode);
+        }
+
+
+        //getGoodsin
+        [HttpGet]
+        [Authorize]
+        [Role("manager")]
+        public async Task<IActionResult> GetGoodsin()
+        {
+            var authUserIdString = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+              if (!int.TryParse(authUserIdString, out int authUserId))
+            {
+                return BadRequest("Invalid user ID");
+            }
+
+            var user = _userRepository.getUser(authUserId);
+            int? branchId = user.BranchId;
+            int? OrganizationId = user.OrganizationId;
+
+
+
+            var goodsIn = await _GoodsinRepository.getGoodsin(OrganizationId.Value, null);
+
+            if (goodsIn == null || !goodsIn.Any())
+            {
+                return NotFound();
+            }
+
+            return Ok(goodsIn);
         }
 
 

@@ -31,6 +31,8 @@ namespace StoreBack.Repositories
             connection = _configuration.GetConnectionString("DefaultConnection");
         }
 
+
+        //get product operator
    
         public async Task<List<GetBarcodeBalanceViewModel>> ProductBalance(int brancheId)
         {
@@ -71,7 +73,7 @@ namespace StoreBack.Repositories
     
 
 
-
+        //make products by manager
         public async Task<List<getBalanceManagerViewModels>> BalanceManager(int OrganizationId,int? branchId)
         {
             getBalanceManagerViewModels productBalance = null;
@@ -106,7 +108,7 @@ namespace StoreBack.Repositories
                         // Check if the BrancheName column is not null before assigning it
                         try
                         {
-                            int ordinal = reader.GetOrdinal("BrancheName");
+                            int ordinal = reader.GetOrdinal("BranchName");
 
                             if (!reader.IsDBNull(ordinal))
                             {
@@ -125,5 +127,12 @@ namespace StoreBack.Repositories
 
             return products;
         }
+
+
+
+
+
+
+
     }
 }
