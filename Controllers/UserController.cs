@@ -133,10 +133,9 @@ namespace StoreBack.Controllers
         [HttpGet("")]
         [Authorize]
         [Role("Administrator")]
-        public async Task<IActionResult> GeteUsers()
+        public async Task<IActionResult> GetUsers([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 5)
         {
             var authUserIdString = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
-
 
             if (!int.TryParse(authUserIdString, out int authUserId))
             {
@@ -145,10 +144,15 @@ namespace StoreBack.Controllers
 
             User authUser = _userRepository.getUser(authUserId);
 
-            var users = await _userRepository.GetUsers(authUser.OrganizationId);
+            var pagedUsers = await _userRepository.GetUsers(authUser.OrganizationId, pageNumber, pageSize);
 
-            return Ok(users);
+            return Ok(new 
+            { 
+                Users = pagedUsers.Results, 
+                TotalCount = pagedUsers.TotalCount 
+            });
         }
+
 
 
         //getBranch

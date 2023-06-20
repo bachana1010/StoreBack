@@ -7,17 +7,24 @@ using StoreBack.ViewModels;
 using Microsoft.Extensions.Configuration;
 using BC = BCrypt.Net.BCrypt;
 using System.Data;
+using System.Collections.Generic;
+using System;
 
 namespace StoreBack.Repositories
 {
+    public class PagedResult<T>
+    {
+        public List<T> Results { get; set; }
+        public int TotalCount { get; set; }
+    }
+
     public interface IUserRepository
     {
         Task<int> AddUser(AddUserViewModel model, User user);
         User getUser(int userId);
         Task DeleteUser(int id);
-
         Task UpdateUser(int id, UpdateserViewModel model);
-        Task<List<User>> GetUsers( int OrganizationId);
+        Task<PagedResult<User>> GetUsers(int OrganizationId, int pageNumber = 1, int pageSize = 5);
     }
     
     public class UserRepository : IUserRepository
@@ -33,8 +40,7 @@ namespace StoreBack.Repositories
             connection = _configuration.GetConnectionString("DefaultConnection");
         }
 
-
-        //getuser
+        //getUser
 
         public User getUser(int userId)
         {
@@ -81,7 +87,7 @@ namespace StoreBack.Repositories
 
 
         //addUser
-        public async Task<int> AddUser(AddUserViewModel model,User user)
+        public async Task<int> AddUser(AddUserViewModel model, User user)
         {
             Console.WriteLine(model.Password);
             using (SqlConnection conn = new SqlConnection(connection))
@@ -117,7 +123,7 @@ namespace StoreBack.Repositories
 
 
         //update
-       public async Task UpdateUser(int id,UpdateserViewModel model)
+       public async Task UpdateUser(int id, UpdateserViewModel model)
         {
             using (SqlConnection conn = new SqlConnection(connection))
             {
@@ -162,11 +168,10 @@ namespace StoreBack.Repositories
             }
         }
 
-
-        //getUsers
-        public async Task<List<User>> GetUsers(int OrganizationId)
+        public async Task<PagedResult<User>> GetUsers(int OrganizationId, int pageNumber = 1, int pageSize = 5)
         {
             List<User> users = new List<User>();
+            int totalCount = 0;
 
             using (SqlConnection conn = new SqlConnection(connection))
             {
@@ -176,8 +181,9 @@ namespace StoreBack.Repositories
                     CommandType = CommandType.StoredProcedure 
                 })
                 {
-                    // Set the OrganizationId parameter
                     cmd.Parameters.Add("@OrganizationId", SqlDbType.Int).Value = OrganizationId;
+                    cmd.Parameters.Add("@PageNumber", SqlDbType.Int).Value = pageNumber;
+                    cmd.Parameters.Add("@PageSize", SqlDbType.Int).Value = pageSize;
 
                     using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
                     {
@@ -192,6 +198,8 @@ namespace StoreBack.Repositories
                                 Username = reader.GetString(reader.GetOrdinal("Username")),
                                 Role = reader.GetString(reader.GetOrdinal("Role")),
                             };
+
+                            totalCount = reader.GetInt32(reader.GetOrdinal("TotalCount"));
                             
                             users.Add(user);
                         }
@@ -199,7 +207,7 @@ namespace StoreBack.Repositories
                 }
             }
 
-            return users;
+            return new PagedResult<User> { Results = users, TotalCount = totalCount };
         }
     }
 }
