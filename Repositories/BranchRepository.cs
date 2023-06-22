@@ -16,7 +16,7 @@ namespace StoreBack.Repositories
         Branches GetBranch(int BranchId);
 
         Task DeleteBranch(int id ); 
-        Task<List<Branches>> GetBranches( int OrganizationId);
+        Task<(List<Branches> branches, int totalCount)> GetBranches(int OrganizationId, int pageNumber, int pageSize);
 
         Task UpdateBranch(int id, UpdateBranchViewModel model);
 
@@ -117,10 +117,12 @@ namespace StoreBack.Repositories
         }
 
 
-            //branches lists
-        public async Task<List<Branches>> GetBranches(int OrganizationId)
+            //branches list
+       public async Task<(List<Branches> branches, int totalCount)> GetBranches(int OrganizationId, int pageNumber, int pageSize)
+
         {
             List<Branches> branches = new List<Branches>();
+            int totalCount = 0;
 
             using (SqlConnection conn = new SqlConnection(connection))
             {
@@ -130,8 +132,9 @@ namespace StoreBack.Repositories
                     CommandType = CommandType.StoredProcedure 
                 })
                 {
-                    // Set the OrganizationId parameter
                     cmd.Parameters.Add("@OrganizationId", SqlDbType.Int).Value = OrganizationId;
+                    cmd.Parameters.Add("@PageNumber", SqlDbType.Int).Value = pageNumber;
+                    cmd.Parameters.Add("@PageSize", SqlDbType.Int).Value = pageSize;
 
                     using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
                     {
@@ -143,7 +146,7 @@ namespace StoreBack.Repositories
                                 deletedAt = reader.GetDateTime(reader.GetOrdinal("DeletedAt"));
                             }
 
-                            Branches branche = new Branches
+                            Branches branch = new Branches
                             {
                                 Id = reader.GetInt32(reader.GetOrdinal("Id")),
                                 BrancheName = reader.GetString(reader.GetOrdinal("BrancheName")),
@@ -152,14 +155,22 @@ namespace StoreBack.Repositories
                                 DeletedAt = deletedAt
                             };
 
-                            branches.Add(branche);
+                            branches.Add(branch);
+
+                            // Get total count from the first row
+                            if (totalCount == 0)
+                            {
+                                totalCount = reader.GetInt32(reader.GetOrdinal("TotalCount"));
+                            }
                         }
                     }
                 }
             }
 
-            return branches;
+            return (branches, totalCount);
         }
+
+
 
         public async Task UpdateBranch(int id,UpdateBranchViewModel model)
         {

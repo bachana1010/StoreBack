@@ -12,12 +12,6 @@ using System;
 
 namespace StoreBack.Repositories
 {
-    public class PagedResult<T>
-    {
-        public List<T> Results { get; set; }
-        public int TotalCount { get; set; }
-    }
-
     public interface IUserRepository
     {
         Task<int> AddUser(AddUserViewModel model, User user);

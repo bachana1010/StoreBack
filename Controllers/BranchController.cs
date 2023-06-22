@@ -110,10 +110,9 @@ namespace StoreBack.Controllers
         [HttpGet("")]
         [Authorize]
         [Role("Administrator")]
-        public async Task<IActionResult> GetBranches()
+        public async Task<IActionResult> GetBranches([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 5)
         {
             var authUserIdString = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
-
 
             if (!int.TryParse(authUserIdString, out int authUserId))
             {
@@ -122,10 +121,19 @@ namespace StoreBack.Controllers
 
             User authUser = _userRepository.getUser(authUserId);
 
-            var branches = await _branchRepository.GetBranches(authUser.OrganizationId);
+            var (branches, totalCount) = await _branchRepository.GetBranches(authUser.OrganizationId, pageNumber, pageSize);
 
-            return Ok(branches);
+            var result = new 
+            {
+                branches = branches,
+                totalCount = totalCount,
+                pageNumber = pageNumber,
+                pageSize = pageSize
+            };
+
+            return Ok(result);
         }
+
 
 
 

@@ -87,33 +87,32 @@ namespace StoreBack.Controllers
         }
 
 
-        //getGoodsin
-        [HttpGet]
-        [Authorize]
-        [Role("manager")]
-        public async Task<IActionResult> GetGoodsin()
-        {
-            var authUserIdString = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
-              if (!int.TryParse(authUserIdString, out int authUserId))
+       //getGoodsin
+            [HttpGet]
+            [Authorize]
+            [Role("manager")]
+            public async Task<IActionResult> GetGoodsin([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 5)
             {
-                return BadRequest("Invalid user ID");
+                var authUserIdString = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+                if (!int.TryParse(authUserIdString, out int authUserId))
+                {
+                    return BadRequest("Invalid user ID");
+                }
+
+                var user = _userRepository.getUser(authUserId);
+                int? branchId = user.BranchId;
+                int? OrganizationId = user.OrganizationId;
+
+                var goodsIn = await _GoodsinRepository.GetGoodsIn(OrganizationId.Value, null, pageNumber, pageSize);
+
+                if (goodsIn.TotalCount == null || !goodsIn.Results.Any())
+                    {
+                        return NotFound();
+                    }
+
+
+                return Ok(goodsIn);
             }
-
-            var user = _userRepository.getUser(authUserId);
-            int? branchId = user.BranchId;
-            int? OrganizationId = user.OrganizationId;
-
-
-
-            var goodsIn = await _GoodsinRepository.getGoodsin(OrganizationId.Value, null);
-
-            if (goodsIn == null || !goodsIn.Any())
-            {
-                return NotFound();
-            }
-
-            return Ok(goodsIn);
-        }
 
 
 

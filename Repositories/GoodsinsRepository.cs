@@ -18,9 +18,9 @@ namespace StoreBack.Repositories
 
         // Task UpdateUser(int id, UpdateserViewModel model);
         // Task<List<User>> GetUsers( int OrganizationId);
-        Task <int> MakeGoodsIn (MakeGoodsInViewModel model, User user);
+        Task<int> MakeGoodsIn(MakeGoodsInViewModel model, User user);
         GetBarcodeViewModel getBarcode(string  barcodetext);
-        Task<List<GetGoodsinViewModel>> getGoodsin( int organizationId, int? branchId);
+        Task<PagedResult<GetGoodsinViewModel>> GetGoodsIn(int organizationId, int? branchId, int pageNumber = 1, int pageSize = 5);
 
     }
     
@@ -112,12 +112,15 @@ namespace StoreBack.Repositories
 
 
         //goodsin list for manager
-
-
-
-        public async Task<List<GetGoodsinViewModel>> getGoodsin(int OrganizationId,int? branchId)
+            public async Task<PagedResult<GetGoodsinViewModel>> GetGoodsIn(int OrganizationId, int? branchId, int pageNumber = 1, int pageSize = 5)
         {
             List<GetGoodsinViewModel> goodsinList = new List<GetGoodsinViewModel>();
+            int totalCount = 0;
+            
+            Console.WriteLine(OrganizationId);
+            Console.WriteLine(pageNumber);
+            Console.WriteLine(pageSize);
+            
             using (SqlConnection conn = new SqlConnection(connection))
             {
                 conn.Open();
@@ -127,11 +130,13 @@ namespace StoreBack.Repositories
                 cmd.CommandText = "GetGoodsIn";
 
                 cmd.Parameters.Add("@OrganizationId", SqlDbType.Int).Value = OrganizationId;
+                cmd.Parameters.Add("@PageNumber", SqlDbType.Int).Value = pageNumber;
+                cmd.Parameters.Add("@PageSize", SqlDbType.Int).Value = pageSize;
 
-                if(branchId.HasValue)
-                {
-                    cmd.Parameters.Add("@branchId", SqlDbType.Int).Value = branchId.Value;
-                }
+                // if(branchId.HasValue) // Only add the BranchId parameter if it has a value.
+                // {
+                // cmd.Parameters.Add("@BranchId", SqlDbType.Int).Value = branchId.Value;
+                // }
 
                 using (SqlDataReader reader = cmd.ExecuteReader())
                 {
@@ -146,12 +151,18 @@ namespace StoreBack.Repositories
                             BarcodeName = reader.GetString(reader.GetOrdinal("BarcodeName"))
                         };
 
+                        // Get the total count from the first row
+                        if (totalCount == 0)
+                        {
+                            totalCount = reader.GetInt32(reader.GetOrdinal("TotalCount"));
+                        }
+
                         goodsinList.Add(goodsinVM);
                     }
                 }
             }
             
-            return goodsinList;
+            return new PagedResult<GetGoodsinViewModel> { Results = goodsinList, TotalCount = totalCount };
         }
 
 
