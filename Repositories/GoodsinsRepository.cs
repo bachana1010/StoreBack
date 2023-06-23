@@ -133,10 +133,10 @@ namespace StoreBack.Repositories
                 cmd.Parameters.Add("@PageNumber", SqlDbType.Int).Value = pageNumber;
                 cmd.Parameters.Add("@PageSize", SqlDbType.Int).Value = pageSize;
 
-                // if(branchId.HasValue) // Only add the BranchId parameter if it has a value.
-                // {
-                // cmd.Parameters.Add("@BranchId", SqlDbType.Int).Value = branchId.Value;
-                // }
+                if(branchId.HasValue) // Only add the BranchId parameter if it has a value.
+                {
+                cmd.Parameters.Add("@BranchId", SqlDbType.Int).Value = branchId.Value;
+                }
 
                 using (SqlDataReader reader = cmd.ExecuteReader())
                 {

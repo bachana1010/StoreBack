@@ -30,12 +30,10 @@ namespace StoreBack.Controllers
             _userRepository = userRepository;
         }
         
-        //get product list
-        //get product list
-       [HttpGet("operator")]
+        [HttpGet]
         [Authorize]
-        [Role("operator")]
-        public async Task<IActionResult> getlist()
+        [Role("operator", "manager")]
+        public async Task<IActionResult> getlist([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 5)
         {
             var authUserIdString = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
 
@@ -45,52 +43,16 @@ namespace StoreBack.Controllers
             }
 
             var user = _userRepository.getUser(authUserId);
-            int? branchId = user.BranchId;
 
-            if (!branchId.HasValue)
-            {
-                return NotFound("User not found");
+            PagedResult<GetBarcodeBalanceViewModel> products = new PagedResult<GetBarcodeBalanceViewModel>();
+
+            if (user.Role == "operator") {
+                products = await _ProductRepository.ProductBalance(user.BranchId, null, pageNumber, pageSize);
+            } else if (user.Role == "manager") {
+                products = await _ProductRepository.ProductBalance(null, user.OrganizationId, pageNumber, pageSize);
             }
 
-            var products = await _ProductRepository.ProductBalance(branchId.Value);
-
-            if (products == null || !products.Any())
-            {
-                return NotFound();
-            }
-
-            return Ok(products);
-        }
-    
-
-
-
-
-            //get product list for manager
-       [HttpGet("manager")]
-        [Authorize]
-        [Role("manager")]
-        public async Task<IActionResult> getlistForManager()
-        {
-            var authUserIdString = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
-
-            if (!int.TryParse(authUserIdString, out int authUserId))
-            {
-                return BadRequest("Invalid user ID");
-            }
-
-            var user = _userRepository.getUser(authUserId);
-            int? branchId = user.BranchId;
-            int? OrganizationId = user.OrganizationId;
-
-            if (!OrganizationId.HasValue || !branchId.HasValue)
-            {
-                return NotFound("User not found or organization/branch not specified");
-            }
-
-            var products = await _ProductRepository.BalanceManager(OrganizationId.Value, null);
-
-            if (products == null || !products.Any())
+            if (products.TotalCount == 0)
             {
                 return NotFound();
             }
@@ -99,6 +61,38 @@ namespace StoreBack.Controllers
         }
 
 
-                
-    }
-}
+}}
+
+    //    [HttpGet("manager")]
+    //     [Authorize]
+    //     [Role("manager")]
+    //     public async Task<IActionResult> getlistForManager([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 5)
+
+    //     {
+    //         var authUserIdString = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+
+    //         if (!int.TryParse(authUserIdString, out int authUserId))
+    //         {
+    //             return BadRequest("Invalid user ID");
+    //         }
+
+    //         var user = _userRepository.getUser(authUserId);
+    //         int? branchId = user.BranchId;
+    //         int? OrganizationId = user.OrganizationId;
+
+    //         if (!OrganizationId.HasValue || !branchId.HasValue)
+    //         {
+    //             return NotFound("User not found or organization/branch not specified");
+    //         }
+
+    //         var products = await _ProductRepository.BalanceManager(OrganizationId.Value, null, pageNumber, pageSize);
+
+
+    //         if (products.TotalCount == null || !products.Results.Any())
+    //         {
+    //             return NotFound();
+    //         }
+
+    //         return Ok(products);
+    //     }    
+

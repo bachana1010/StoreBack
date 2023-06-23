@@ -19,7 +19,7 @@ namespace StoreBack.Repositories
         // Task UpdateUser(int id, UpdateserViewModel model);
         // Task<List<User>> GetUsers( int OrganizationId);
         Task <int> MakeGoodsOut (MakeGoodsOutViewModel model, User user);
-        Task<List<GetGoodsOutViewModel>> getGoodsOut( int organizationId, int? branchId);
+        Task<PagedResult<GetGoodsOutViewModel>> getGoodsOut(int organizationId, int? branchId, int pageNumber = 1, int pageSize = 5);
 
     }
     
@@ -91,9 +91,16 @@ namespace StoreBack.Repositories
 
 
 
-        public async Task<List<GetGoodsOutViewModel>> getGoodsOut(int OrganizationId,int? branchId)
+        public async Task<PagedResult<GetGoodsOutViewModel>> getGoodsOut(int OrganizationId, int? branchId, int pageNumber = 1, int pageSize = 5)
+
         {
             List<GetGoodsOutViewModel> goodsOutList = new List<GetGoodsOutViewModel>();
+            int totalCount = 0;
+
+            Console.WriteLine(OrganizationId);
+            Console.WriteLine(pageNumber);
+            Console.WriteLine(pageSize);
+
             using (SqlConnection conn = new SqlConnection(connection))
             {
                 conn.Open();
@@ -102,7 +109,10 @@ namespace StoreBack.Repositories
                 cmd.CommandType = CommandType.StoredProcedure;
                 cmd.CommandText = "GetGoodsOut";
 
+
                 cmd.Parameters.Add("@OrganizationId", SqlDbType.Int).Value = OrganizationId;
+                cmd.Parameters.Add("@PageNumber", SqlDbType.Int).Value = pageNumber;
+                cmd.Parameters.Add("@PageSize", SqlDbType.Int).Value = pageSize;
 
                 if(branchId.HasValue)
                 {
@@ -117,17 +127,22 @@ namespace StoreBack.Repositories
                         {
                             Quantity = reader.GetFloat(reader.GetOrdinal("Quantity")),
                             OutDate = reader.GetDateTime(reader.GetOrdinal("OutDate")),
-                            BranchName = reader.GetString(reader.GetOrdinal("BranchName")),
+                            BranchName = reader.GetString(reader.GetOrdinal("BrancheName")),
                             OperatorUserName = reader.GetString(reader.GetOrdinal("OperatorUserName")),
                             BarcodeName = reader.GetString(reader.GetOrdinal("BarcodeName"))
                         };
+                        if (totalCount == 0)
+                        {
+                            totalCount = reader.GetInt32(reader.GetOrdinal("TotalCount"));
+                        }
 
                         goodsOutList.Add(goodsOutVM);
                     }
                 }
             }
             
-            return goodsOutList;
+                return new PagedResult<GetGoodsOutViewModel> { Results = goodsOutList, TotalCount = totalCount };
+
         }
 
                 

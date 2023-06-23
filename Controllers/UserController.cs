@@ -33,7 +33,7 @@ namespace StoreBack.Controllers
 
         [HttpPost("")]
         [Authorize]
-        [Role("Administrator")]
+        [Role("administrator")]
         public async Task<IActionResult> CreateUser([FromBody] AddUserViewModel model)
         {
             var authUserIdString = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
@@ -59,7 +59,7 @@ namespace StoreBack.Controllers
 
         [HttpPut("{id}")]
         [Authorize]
-        [Role("Administrator")]
+        [Role("administrator")]
         public async Task<IActionResult> UpdateUser(int id,[FromBody] UpdateserViewModel model)
         {
             var authUserIdString = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
@@ -99,7 +99,7 @@ namespace StoreBack.Controllers
         //delete user
         [HttpDelete("{id}")]
         [Authorize]
-        [Role("Administrator")]
+        [Role("administrator")]
         public async Task<IActionResult> DeleteUser(int id)
         {
             var authUserIdString = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
@@ -132,7 +132,7 @@ namespace StoreBack.Controllers
         //getusers
         [HttpGet("")]
         [Authorize]
-        [Role("Administrator")]
+        [Role("administrator")]
         public async Task<IActionResult> GetUsers([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 5)
         {
             var authUserIdString = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
@@ -159,7 +159,7 @@ namespace StoreBack.Controllers
 
         [HttpGet("{Id}")]
         [Authorize]
-        [Role("Administrator")]
+        [Role("administrator")]
         public async Task<IActionResult> GetUser(int Id)
         {
             var authUserIdString = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;

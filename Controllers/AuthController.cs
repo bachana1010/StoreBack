@@ -45,72 +45,51 @@ namespace StoreBack.Controllers
         {
             return BadRequest(new { error = e.Message });
         }
-    } 
-
-
-
-        //login
-
-
-
-
+    }
+     
         [HttpPost("login")]
         public async Task<IActionResult> LoginUser([FromBody] StoreBack.ViewModels.LoginRequest model)
         {
-        // try
-        // {
-        var user = await _authRepository.LoginUser(model.Email, model.Password);
-        Console.WriteLine("63 xazi");
-        Console.WriteLine(user);
-        Console.WriteLine(model.Email);
-        Console.WriteLine(model.Password);
-
-
-
-
-        if (user == null)
-        {
-        Console.WriteLine("67 xazi");
-
-        return Unauthorized();
-        }
-
-        Console.WriteLine(user.Username);
-        Console.WriteLine(user.Id);
-        Console.WriteLine(user.Email);
-
-        var tokenHandler = new JwtSecurityTokenHandler();
-        var key = Encoding.ASCII.GetBytes(_jwtSettings.Secret);
-
-        var claims = new[]
+            try
             {
-                new Claim("sub", user.Id.ToString()),
-                new Claim("id", user.Id.ToString()),
-                new Claim("username", user.Username),
-                new Claim("email", user.Email),
-                new Claim("organizationId", user.OrganizationId.ToString()),
-                new Claim("role", user.Role.ToString())
-        };
+                var user = await _authRepository.LoginUser(model.Email, model.Password);
 
-        var tokenDescriptor = new SecurityTokenDescriptor
-        {
-        Subject = new ClaimsIdentity(claims),
-        Expires = DateTime.UtcNow.AddMinutes(_jwtSettings.ExpirationMinutes),
-        SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
-        };
+                if (user == null)
+                {
+                    return Unauthorized();
+                }
 
-        var token = tokenHandler.CreateToken(tokenDescriptor);
-        var tokenString = tokenHandler.WriteToken(token);
+                var tokenHandler = new JwtSecurityTokenHandler();
+                var key = Encoding.ASCII.GetBytes(_jwtSettings.Secret);
 
-        return Ok(new { Token = tokenString, user = user });
+                var claims = new[]
+                    {
+                        new Claim("sub", user.Id.ToString()),
+                        new Claim("id", user.Id.ToString()),
+                        new Claim("username", user.Username),
+                        new Claim("email", user.Email),
+                        new Claim("organizationId", user.OrganizationId.ToString()),
+                        new Claim("role", user.Role.ToString())
+                };
+
+                var tokenDescriptor = new SecurityTokenDescriptor
+                {
+                Subject = new ClaimsIdentity(claims),
+                Expires = DateTime.UtcNow.AddMinutes(_jwtSettings.ExpirationMinutes),
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+                };
+
+                var token = tokenHandler.CreateToken(tokenDescriptor);
+                var tokenString = tokenHandler.WriteToken(token);
+
+                return Ok(new { Token = tokenString, user = user });
+                }
+            catch (Exception e)
+            {
+                return BadRequest(new { error = e.Message });
+            }
         }
-        // catch (Exception e)
-        // {
-        //     return BadRequest(new { error = e.Message });
-        // }
-        }
-
-
+    }
 
 }
  

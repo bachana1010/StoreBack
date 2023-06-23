@@ -69,7 +69,8 @@ namespace StoreBack.Controllers
         [HttpGet]
         [Authorize]
         [Role("manager")]
-        public async Task<IActionResult> GetGoodsOut()
+        public async Task<IActionResult> GetGoodsOut([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 5)
+
         {
             var authUserIdString = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
               if (!int.TryParse(authUserIdString, out int authUserId))
@@ -83,14 +84,14 @@ namespace StoreBack.Controllers
 
 
 
-            var goodsIn = await _GoodsOutRepository.getGoodsOut(OrganizationId.Value, null);
+            var goodsOut = await _GoodsOutRepository.getGoodsOut(OrganizationId.Value, null, pageNumber, pageSize);
 
-            if (goodsIn == null || !goodsIn.Any())
+            if (goodsOut.TotalCount == null || !goodsOut.Results.Any())
             {
                 return NotFound();
             }
 
-            return Ok(goodsIn);
+            return Ok(goodsOut);
         }
 
 

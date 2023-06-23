@@ -4,12 +4,12 @@ using System.Collections.Generic; // Required for ICollection
 
 namespace StoreBack.Models {
 
-    public enum Role
-    {
-        Administrator,
-        Operator,
-        Manager
-    }
+    // public enum Role
+    // {
+    //     Administrator,
+    //     Operator,
+    //     Manager
+    // }
 
     public class User
     {
@@ -25,6 +25,8 @@ namespace StoreBack.Models {
         public string LastName { get; set; }
         public string Username { get; set; }
         public string PasswordHash { get; set; }
+
+        public int RoleId {get; set;}
 
         public string Role { get; set; }
 
