@@ -47,12 +47,12 @@ namespace StoreBack.Controllers
         }
     }
      
-        [HttpPost("login")]
+       [HttpPost("login")]
         public async Task<IActionResult> LoginUser([FromBody] StoreBack.ViewModels.LoginRequest model)
         {
             try
             {
-                var user = await _authRepository.LoginUser(model.Email, model.Password);
+                var (user, refreshToken) = await _authRepository.LoginUser(model.Email, model.Password);
 
                 if (user == null)
                 {
@@ -63,32 +63,33 @@ namespace StoreBack.Controllers
                 var key = Encoding.ASCII.GetBytes(_jwtSettings.Secret);
 
                 var claims = new[]
-                    {
-                        new Claim("sub", user.Id.ToString()),
-                        new Claim("id", user.Id.ToString()),
-                        new Claim("username", user.Username),
-                        new Claim("email", user.Email),
-                        new Claim("organizationId", user.OrganizationId.ToString()),
-                        new Claim("role", user.Role.ToString())
+                {
+                    new Claim("sub", user.Id.ToString()),
+                    new Claim("id", user.Id.ToString()),
+                    new Claim("username", user.Username),
+                    new Claim("email", user.Email),
+                    new Claim("organizationId", user.OrganizationId.ToString()),
+                    new Claim("role", user.Role.ToString())
                 };
 
                 var tokenDescriptor = new SecurityTokenDescriptor
                 {
-                Subject = new ClaimsIdentity(claims),
-                Expires = DateTime.UtcNow.AddMinutes(_jwtSettings.ExpirationMinutes),
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+                    Subject = new ClaimsIdentity(claims),
+                    Expires = DateTime.UtcNow.AddMinutes(_jwtSettings.ExpirationMinutes),
+                    SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
                 };
 
                 var token = tokenHandler.CreateToken(tokenDescriptor);
                 var tokenString = tokenHandler.WriteToken(token);
 
-                return Ok(new { Token = tokenString, user = user });
-                }
+                return Ok(new { Token = tokenString, RefreshToken = refreshToken, user = user });
+            }
             catch (Exception e)
             {
                 return BadRequest(new { error = e.Message });
             }
         }
+
     }
 
 }

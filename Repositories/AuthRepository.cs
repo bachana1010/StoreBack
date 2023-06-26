@@ -13,8 +13,7 @@ namespace StoreBack.Repositories
     public interface IAuthRepository
     {
         Task<int> RegisterOrganizationAndUser(RegisterOrganizationViewModel model);
-                Task<User> LoginUser(string email, string password);
-
+        Task<(User, string)> LoginUser(string email, string password);
     }
     
     public class AuthRepository : IAuthRepository
@@ -80,15 +79,12 @@ namespace StoreBack.Repositories
                     throw;
                 }
             }
-
-            
         }
 
 
-        //loign
-        public async Task<User> LoginUser(string email, string password)
+        //login
+        public async Task<(User, string)> LoginUser(string email, string password)
         {
-            
             try
             {
                 using (SqlConnection conn = new SqlConnection(connection))
@@ -112,13 +108,23 @@ namespace StoreBack.Repositories
                                 PasswordHash = reader.GetString(reader.GetOrdinal("PasswordHash")),
                                 Username = reader.GetString(reader.GetOrdinal("Username")),
                                 Role = reader.GetString(reader.GetOrdinal("Role")),
-
                             };
 
                             bool validPassword = BC.Verify(password, user.PasswordHash);
                             if (validPassword)
                             {
-                                return user;
+                                // Generate refresh token
+                                RefreshTokens refreshToken = new RefreshTokens
+                                {
+                                    Token = Guid.NewGuid().ToString(), // You can use any method for generating token
+                                    Expires = DateTime.UtcNow.AddDays(7), // Set token to expire after 7 days
+                                    UserId = user.Id,
+                                };
+
+                                _context.RefreshTokens.Add(refreshToken);
+                                await _context.SaveChangesAsync();
+
+                                return (user, refreshToken.Token);
                             }
                         }
                     }
@@ -129,12 +135,7 @@ namespace StoreBack.Repositories
                 throw new Exception("An error occurred while executing the SQL command.", ex);
             }
 
-            return null;
+            return (null, null);
         }
-
-
-
     }
-
-    
 }

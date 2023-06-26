@@ -16,13 +16,14 @@ namespace StoreBack.Migrations
                 BEGIN
                     -- Calculate total count
                     DECLARE @TotalCount INT;
-                    SELECT @TotalCount = COUNT(*) FROM Branches WHERE OrganizationId = @OrganizationId AND deletedAt IS NULL;
+                    SELECT @TotalCount = COUNT(*) FROM Users WHERE OrganizationId = @OrganizationId;
 
                     -- Fetch the required page of data
-                    SELECT *, @TotalCount AS TotalCount 
-                    FROM Branches 
-                    WHERE OrganizationId = @OrganizationId AND deletedAt IS NULL
-                    ORDER BY Id
+                    SELECT *, @TotalCount AS TotalCount, Roles.[Key] as Role
+                    FROM Users 
+                    INNER JOIN Roles ON Users.RoleId = Roles.Id
+                    WHERE OrganizationId = @OrganizationId 
+                    ORDER BY Users.Id
                     OFFSET (@PageNumber - 1) * @PageSize ROWS 
                     FETCH NEXT @PageSize ROWS ONLY
                 END

@@ -129,11 +129,11 @@ namespace StoreBack.Controllers
         }
 
 
-        //getusers
+   //getusers
         [HttpGet("")]
         [Authorize]
         [Role("administrator")]
-        public async Task<IActionResult> GetUsers([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 5)
+        public async Task<IActionResult> GetUsers([FromQuery] UserFilterViewModel filter, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 5)
         {
             var authUserIdString = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
 
@@ -144,7 +144,7 @@ namespace StoreBack.Controllers
 
             User authUser = _userRepository.getUser(authUserId);
 
-            var pagedUsers = await _userRepository.GetUsers(authUser.OrganizationId, pageNumber, pageSize);
+            var pagedUsers = await _userRepository.GetUsers(filter, authUser.OrganizationId, pageNumber, pageSize);
 
             return Ok(new 
             { 

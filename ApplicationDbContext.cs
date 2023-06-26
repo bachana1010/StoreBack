@@ -16,5 +16,7 @@ namespace StoreBack
         public DbSet<User> Users { get; set; }
         public DbSet<Organization> Organizations { get; set; }
         public DbSet<Branches> Branches { get; set; }
+        public DbSet<RefreshTokens> RefreshTokens { get; set; }
+
     }
 }

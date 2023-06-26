@@ -35,7 +35,7 @@ namespace StoreBack.Controllers
         //add branch
 
         [HttpPost("")]
-        [Role("Administrator")]
+        [Role("administrator")]
         [Authorize]
         public async Task<IActionResult> CreateBranche([FromBody] AddBranchViewModel model)
         {
@@ -64,7 +64,7 @@ namespace StoreBack.Controllers
         //delete user
         [HttpDelete("{BranchId}")]
         [Authorize]
-        [Role("Administrator")]
+        [Role("administrator")]
         public async Task<IActionResult> DeleteBranch(int BranchId)
         {
             var authUserIdString = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
@@ -109,7 +109,7 @@ namespace StoreBack.Controllers
 
         [HttpGet("")]
         [Authorize]
-        [Role("Administrator")]
+        [Role("administrator")]
         public async Task<IActionResult> GetBranches([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 5)
         {
             var authUserIdString = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
@@ -142,7 +142,7 @@ namespace StoreBack.Controllers
 
         [HttpGet("{Id}")]
         [Authorize]
-        [Role("Administrator")]
+        [Role("administrator")]
         public async Task<IActionResult> GetBranch(int Id)
         {
             var authUserIdString = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
@@ -163,7 +163,7 @@ namespace StoreBack.Controllers
 
         [HttpPut("{id}")]
         [Authorize]
-        [Role("Administrator")]
+        [Role("administrator")]
         public async Task<IActionResult> UpdateBranch(int id,[FromBody] UpdateBranchViewModel model)
         {
             var authUserIdString = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;

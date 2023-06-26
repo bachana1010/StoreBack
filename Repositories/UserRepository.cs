@@ -18,7 +18,7 @@ namespace StoreBack.Repositories
         User getUser(int userId);
         Task DeleteUser(int id);
         Task UpdateUser(int id, UpdateserViewModel model);
-        Task<PagedResult<User>> GetUsers(int OrganizationId, int pageNumber = 1, int pageSize = 5);
+        Task<PagedResult<User>> GetUsers(UserFilterViewModel filter , int OrganizationId, int pageNumber = 1, int pageSize = 5);
     }
     
     public class UserRepository : IUserRepository
@@ -162,46 +162,50 @@ namespace StoreBack.Repositories
             }
         }
 
-        public async Task<PagedResult<User>> GetUsers(int OrganizationId, int pageNumber = 1, int pageSize = 5)
-        {
-            List<User> users = new List<User>();
-            int totalCount = 0;
-
-            using (SqlConnection conn = new SqlConnection(connection))
+        public async Task<PagedResult<User>> GetUsers(UserFilterViewModel filter, int OrganizationId, int pageNumber = 1, int pageSize = 5)
             {
-                await conn.OpenAsync();
-                using (SqlCommand cmd = new SqlCommand("GetUsers", conn) 
-                { 
-                    CommandType = CommandType.StoredProcedure 
-                })
+                List<User> users = new List<User>();
+                int totalCount = 0;
+
+                using (SqlConnection conn = new SqlConnection(connection))
                 {
-                    cmd.Parameters.Add("@OrganizationId", SqlDbType.Int).Value = OrganizationId;
-                    cmd.Parameters.Add("@PageNumber", SqlDbType.Int).Value = pageNumber;
-                    cmd.Parameters.Add("@PageSize", SqlDbType.Int).Value = pageSize;
-
-                    using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
+                    await conn.OpenAsync();
+                    using (SqlCommand cmd = new SqlCommand("GetUsers", conn) 
+                    { 
+                        CommandType = CommandType.StoredProcedure 
+                    })
                     {
-                        while (await reader.ReadAsync())
-                        {
-                            User user = new User
-                            {
-                                Id = reader.GetInt32(reader.GetOrdinal("Id")),
-                                FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
-                                LastName = reader.GetString(reader.GetOrdinal("LastName")),
-                                Email = reader.GetString(reader.GetOrdinal("Email")),
-                                Username = reader.GetString(reader.GetOrdinal("Username")),
-                                Role = reader.GetString(reader.GetOrdinal("Role")),
-                            };
+                        cmd.Parameters.Add("@OrganizationId", SqlDbType.Int).Value = OrganizationId;
+                        cmd.Parameters.Add("@PageNumber", SqlDbType.Int).Value = pageNumber;
+                        cmd.Parameters.Add("@PageSize", SqlDbType.Int).Value = pageSize;
 
-                            totalCount = reader.GetInt32(reader.GetOrdinal("TotalCount"));
-                            
-                            users.Add(user);
+                        cmd.Parameters.Add("@Username", SqlDbType.NVarChar).Value = (object)filter.Username ?? DBNull.Value;
+                        cmd.Parameters.Add("@Email", SqlDbType.NVarChar).Value = (object)filter.Email ?? DBNull.Value;
+                        cmd.Parameters.Add("@Role", SqlDbType.NVarChar).Value = (object)filter.Role ?? DBNull.Value;
+
+                        using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
+                        {
+                            while (await reader.ReadAsync())
+                            {
+                                User user = new User
+                                {
+                                    Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                                    FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
+                                    LastName = reader.GetString(reader.GetOrdinal("LastName")),
+                                    Email = reader.GetString(reader.GetOrdinal("Email")),
+                                    Username = reader.GetString(reader.GetOrdinal("Username")),
+                                    Role = reader.GetString(reader.GetOrdinal("Role")),
+                                };
+
+                                totalCount = reader.GetInt32(reader.GetOrdinal("TotalCount"));
+                                
+                                users.Add(user);
+                            }
                         }
                     }
                 }
-            }
 
-            return new PagedResult<User> { Results = users, TotalCount = totalCount };
-        }
-    }
-}
+                return new PagedResult<User> { Results = users, TotalCount = totalCount };
+            }
+                }
+            }

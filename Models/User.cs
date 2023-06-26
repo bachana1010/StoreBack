@@ -28,7 +28,7 @@ namespace StoreBack.Models {
 
         public int RoleId {get; set;}
 
-        public string Role { get; set; }
+        public string? Role { get; set; }
 
         [ForeignKey("Branch")]
         public int? BranchId { get; set; }
