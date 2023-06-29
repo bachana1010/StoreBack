@@ -16,7 +16,7 @@ namespace StoreBack.Repositories
         Branches GetBranch(int BranchId);
 
         Task DeleteBranch(int id ); 
-        Task<PagedResult<Branches>> GetBranches(BranchFilterViewModel filter, int OrganizationId, int pageNumber = 1, int pageSize = 5);
+        Task<PagedResult<Branches>> GetBranches(string? BrancheName, string? Username, int OrganizationId, int pageNumber = 1, int pageSize = 5);
 
         Task UpdateBranch(int id, UpdateBranchViewModel model);
 
@@ -35,6 +35,7 @@ namespace StoreBack.Repositories
             _configuration = configuration;
             connection = _configuration.GetConnectionString("DefaultConnection");
         }
+
 
         public Branches GetBranch(int BranchId)
         {
@@ -75,6 +76,8 @@ namespace StoreBack.Repositories
             }
         }
 
+
+    //addbranch
         public async Task addBranch(AddBranchViewModel model, User user )
         {
             using (SqlConnection conn = new SqlConnection(connection))
@@ -116,55 +119,59 @@ namespace StoreBack.Repositories
             }
         }
 
-        public async Task<PagedResult<Branches>> GetBranches(BranchFilterViewModel filter, int OrganizationId, int pageNumber = 1, int pageSize = 5)
-        {
-            List<Branches> branches = new List<Branches>();
-            int totalCount = 0;
-
-            using (SqlConnection conn = new SqlConnection(connection))
+            //branche list
+                    public async Task<PagedResult<Branches>> GetBranches(string? BrancheName , string? Username , int OrganizationId, int pageNumber = 1, int pageSize = 5)
             {
-                await conn.OpenAsync();
-                using (SqlCommand cmd = new SqlCommand("GetBranches", conn) 
-                { 
-                    CommandType = CommandType.StoredProcedure 
-                })
+                Console.WriteLine($"BrancheName: {BrancheName}");
+
+                Console.WriteLine($"BrancheName: {Username}");
+
+                List<Branches> branches = new List<Branches>();
+                int totalCount = 0;
+
+                using (SqlConnection conn = new SqlConnection(connection))
                 {
-                    cmd.Parameters.Add("@OrganizationId", SqlDbType.Int).Value = OrganizationId;
-                    cmd.Parameters.Add("@PageNumber", SqlDbType.Int).Value = pageNumber;
-                    cmd.Parameters.Add("@PageSize", SqlDbType.Int).Value = pageSize;
-                    cmd.Parameters.Add("@BrancheName", SqlDbType.NVarChar).Value = (object)filter.BrancheName ?? DBNull.Value;
-                    cmd.Parameters.Add("@Username", SqlDbType.NVarChar).Value = (object)filter.Username ?? DBNull.Value;
-
-                    using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
+                    await conn.OpenAsync();
+                    using (SqlCommand cmd = new SqlCommand("GetBranches", conn) 
+                    { 
+                        CommandType = CommandType.StoredProcedure 
+                    })
                     {
-                        while (await reader.ReadAsync())
+                        cmd.Parameters.Add("@OrganizationId", SqlDbType.Int).Value = OrganizationId;
+                        cmd.Parameters.Add("@PageNumber", SqlDbType.Int).Value = pageNumber;
+                        cmd.Parameters.Add("@PageSize", SqlDbType.Int).Value = pageSize;
+                        cmd.Parameters.Add("@BrancheName", SqlDbType.NVarChar).Value = (object)BrancheName ?? DBNull.Value;
+                        cmd.Parameters.Add("@Username", SqlDbType.NVarChar).Value = (object)Username ?? DBNull.Value;
+
+                        using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
                         {
-                            DateTime? deletedAt = null;
-                            if (!reader.IsDBNull(reader.GetOrdinal("DeletedAt")))
+                            while (await reader.ReadAsync())
                             {
-                                deletedAt = reader.GetDateTime(reader.GetOrdinal("DeletedAt"));
+                                DateTime? deletedAt = null;
+                                if (!reader.IsDBNull(reader.GetOrdinal("DeletedAt")))
+                                {
+                                    deletedAt = reader.GetDateTime(reader.GetOrdinal("DeletedAt"));
+                                }
+
+                                Branches branch = new Branches
+                                {
+                                    Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                                    BrancheName = reader.GetString(reader.GetOrdinal("BrancheName")),
+                                    OrganizationId = reader.GetInt32(reader.GetOrdinal("OrganizationId")),
+                                    AddedByUserId = reader.GetInt32(reader.GetOrdinal("AddedByUserId")),
+                                    DeletedAt = deletedAt
+                                };
+
+                                totalCount = reader.GetInt32(reader.GetOrdinal("TotalCount"));
+                                
+                                branches.Add(branch);
                             }
-
-                            Branches branch = new Branches
-                            {
-                                Id = reader.GetInt32(reader.GetOrdinal("Id")),
-                                BrancheName = reader.GetString(reader.GetOrdinal("BrancheName")),
-                                OrganizationId = reader.GetInt32(reader.GetOrdinal("OrganizationId")),
-                                AddedByUserId = reader.GetInt32(reader.GetOrdinal("AddedByUserId")),
-                                DeletedAt = deletedAt
-                            };
-
-                            totalCount = reader.GetInt32(reader.GetOrdinal("TotalCount"));
-                            
-                            branches.Add(branch);
                         }
                     }
                 }
+
+                return new PagedResult<Branches> { Results = branches, TotalCount = totalCount };
             }
-
-            return new PagedResult<Branches> { Results = branches, TotalCount = totalCount };
-        }
-
 
 
         public async Task UpdateBranch(int id,UpdateBranchViewModel model)
