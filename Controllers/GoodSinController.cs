@@ -88,11 +88,28 @@ namespace StoreBack.Controllers
 
 
        //getGoodsin
-            [HttpGet]
-            [Authorize]
-            [Role("manager")]
-            public async Task<IActionResult> GetGoodsin([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 5)
+        [HttpGet]
+        [Authorize]
+        [Role("manager")]
+        public async Task<IActionResult> GetGoodsin([FromQuery] string quantityOperator = null, [FromQuery] decimal? quantity = null, [FromQuery] DateTime? dateFrom = null, [FromQuery] DateTime? dateTo = null, [FromQuery] int? branchId = null, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 5)
+        {
+            try
             {
+                // Log the start of the call
+                Console.WriteLine("GetGoodsin started");
+                Console.WriteLine(quantity);
+                        Console.WriteLine(quantityOperator);
+                                        Console.WriteLine(pageNumber);
+
+
+
+
+                // Add validation for pageNumber and pageSize
+                if(pageNumber < 1 || pageSize < 1)
+                {
+                    return BadRequest("Invalid pageNumber or pageSize");
+                }
+
                 var authUserIdString = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
                 if (!int.TryParse(authUserIdString, out int authUserId))
                 {
@@ -100,19 +117,29 @@ namespace StoreBack.Controllers
                 }
 
                 var user = _userRepository.getUser(authUserId);
-                int? branchId = user.BranchId;
-                int? OrganizationId = user.OrganizationId;
+                int? userOrganizationId = user.OrganizationId;
 
-                var goodsIn = await _GoodsinRepository.GetGoodsIn(OrganizationId.Value, null, pageNumber, pageSize);
+                var goodsIn = await _GoodsinRepository.GetGoodsIn(userOrganizationId.Value, branchId, quantityOperator, quantity, dateFrom, dateTo, pageNumber, pageSize);
 
                 if (goodsIn.TotalCount == null || !goodsIn.Results.Any())
-                    {
-                        return NotFound();
-                    }
+                {
+                    return NotFound();
+                }
 
+                // Log the end of the call
+                Console.WriteLine("GetGoodsin finished");
 
                 return Ok(goodsIn);
             }
+            catch(Exception e)
+            {
+                // Log the exception
+                Console.WriteLine($"GetGoodsin failed with exception: {e.Message}");
+
+                // Return server error status code with exception message
+                return StatusCode(500, e.Message);
+            }
+        }
 
 
 

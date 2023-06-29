@@ -19,7 +19,7 @@ namespace StoreBack.Repositories
         // Task UpdateUser(int id, UpdateserViewModel model);
         // Task<List<User>> GetUsers( int OrganizationId);
         Task <int> MakeGoodsOut (MakeGoodsOutViewModel model, User user);
-        Task<PagedResult<GetGoodsOutViewModel>> getGoodsOut(int organizationId, int? branchId, int pageNumber = 1, int pageSize = 5);
+     Task<PagedResult<GetGoodsOutViewModel>> getGoodsOut(int organizationId, int? branchId, int pageNumber = 1, int pageSize = 5, string quantityOperator = null, float? quantityValue = null, DateTime? dateFrom = null, DateTime? dateTo = null);
 
     }
     
@@ -91,59 +91,68 @@ namespace StoreBack.Repositories
 
 
 
-        public async Task<PagedResult<GetGoodsOutViewModel>> getGoodsOut(int OrganizationId, int? branchId, int pageNumber = 1, int pageSize = 5)
-
-        {
-            List<GetGoodsOutViewModel> goodsOutList = new List<GetGoodsOutViewModel>();
-            int totalCount = 0;
-
-            Console.WriteLine(OrganizationId);
-            Console.WriteLine(pageNumber);
-            Console.WriteLine(pageSize);
-
-            using (SqlConnection conn = new SqlConnection(connection))
+                    public async Task<PagedResult<GetGoodsOutViewModel>> getGoodsOut(int OrganizationId, int? branchId, int pageNumber = 1, int pageSize = 5, string quantityOperator = null, float? quantityValue = null, DateTime? dateFrom = null, DateTime? dateTo = null)
             {
-                conn.Open();
-                SqlCommand cmd = new SqlCommand();
-                cmd.Connection = conn;
-                cmd.CommandType = CommandType.StoredProcedure;
-                cmd.CommandText = "GetGoodsOut";
+                List<GetGoodsOutViewModel> goodsOutList = new List<GetGoodsOutViewModel>();
+                int totalCount = 0;
 
-
-                cmd.Parameters.Add("@OrganizationId", SqlDbType.Int).Value = OrganizationId;
-                cmd.Parameters.Add("@PageNumber", SqlDbType.Int).Value = pageNumber;
-                cmd.Parameters.Add("@PageSize", SqlDbType.Int).Value = pageSize;
-
-                if(branchId.HasValue)
+                using (SqlConnection conn = new SqlConnection(connection))
                 {
-                    cmd.Parameters.Add("@branchId", SqlDbType.Int).Value = branchId.Value;
-                }
+                    conn.Open();
+                    SqlCommand cmd = new SqlCommand();
+                    cmd.Connection = conn;
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.CommandText = "GetGoodsOut";
 
-                using (SqlDataReader reader = cmd.ExecuteReader())
-                {
-                    while (reader.Read())
+                    cmd.Parameters.Add("@OrganizationId", SqlDbType.Int).Value = OrganizationId;
+                    cmd.Parameters.Add("@PageNumber", SqlDbType.Int).Value = pageNumber;
+                    cmd.Parameters.Add("@PageSize", SqlDbType.Int).Value = pageSize;
+
+                    if(branchId.HasValue)
                     {
-                        GetGoodsOutViewModel goodsOutVM = new GetGoodsOutViewModel
-                        {
-                            Quantity = reader.GetFloat(reader.GetOrdinal("Quantity")),
-                            OutDate = reader.GetDateTime(reader.GetOrdinal("OutDate")),
-                            BranchName = reader.GetString(reader.GetOrdinal("BrancheName")),
-                            OperatorUserName = reader.GetString(reader.GetOrdinal("OperatorUserName")),
-                            BarcodeName = reader.GetString(reader.GetOrdinal("BarcodeName"))
-                        };
-                        if (totalCount == 0)
-                        {
-                            totalCount = reader.GetInt32(reader.GetOrdinal("TotalCount"));
-                        }
+                        cmd.Parameters.Add("@BranchId", SqlDbType.Int).Value = branchId.Value;
+                    }
+                    
+                    if(!string.IsNullOrEmpty(quantityOperator) && quantityValue.HasValue)
+                    {
+                        cmd.Parameters.Add("@QuantityOperator", SqlDbType.NVarChar, 1).Value = quantityOperator;
+                        cmd.Parameters.Add("@QuantityValue", SqlDbType.Float).Value = quantityValue.Value;
+                    }
+                    
+                    if(dateFrom.HasValue)
+                    {
+                        cmd.Parameters.Add("@DateFrom", SqlDbType.DateTime2).Value = dateFrom.Value;
+                    }
+                    
+                    if(dateTo.HasValue)
+                    {
+                        cmd.Parameters.Add("@DateTo", SqlDbType.DateTime2).Value = dateTo.Value;
+                    }
 
-                        goodsOutList.Add(goodsOutVM);
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            GetGoodsOutViewModel goodsOutVM = new GetGoodsOutViewModel
+                            {
+                                Quantity = reader.GetFloat(reader.GetOrdinal("Quantity")),
+                                OutDate = reader.GetDateTime(reader.GetOrdinal("OutDate")),
+                            BranchName = reader.GetString(reader.GetOrdinal("BranchName")),
+                                OperatorUserName = reader.GetString(reader.GetOrdinal("OperatorUserName")),
+                                BarcodeName = reader.GetString(reader.GetOrdinal("BarcodeName"))
+                            };
+                            if (totalCount == 0)
+                            {
+                                totalCount = reader.GetInt32(reader.GetOrdinal("TotalCount"));
+                            }
+
+                            goodsOutList.Add(goodsOutVM);
+                        }
                     }
                 }
-            }
-            
+                
                 return new PagedResult<GetGoodsOutViewModel> { Results = goodsOutList, TotalCount = totalCount };
-
-        }
+            }
 
                 
  }

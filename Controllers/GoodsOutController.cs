@@ -66,33 +66,30 @@ namespace StoreBack.Controllers
         }
 
            //getGoodOut
-        [HttpGet]
-        [Authorize]
-        [Role("manager")]
-        public async Task<IActionResult> GetGoodsOut([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 5)
-
-        {
-            var authUserIdString = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
-              if (!int.TryParse(authUserIdString, out int authUserId))
+            [HttpGet]
+            [Authorize]
+            [Role("manager")]
+            public async Task<IActionResult> GetGoodsOut([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 5, [FromQuery] string quantityOperator = null, [FromQuery] float? quantityValue = null, [FromQuery] DateTime? dateFrom = null, [FromQuery] DateTime? dateTo = null)
             {
-                return BadRequest("Invalid user ID");
+                var authUserIdString = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+                if (!int.TryParse(authUserIdString, out int authUserId))
+                {
+                    return BadRequest("Invalid user ID");
+                }
+
+                var user = _userRepository.getUser(authUserId);
+                int? branchId = user.BranchId;
+                int? organizationId = user.OrganizationId;
+
+                var goodsOut = await _GoodsOutRepository.getGoodsOut(organizationId.Value, null, pageNumber, pageSize, quantityOperator, quantityValue, dateFrom, dateTo);
+
+                if (goodsOut.TotalCount == null || !goodsOut.Results.Any())
+                {
+                    return NotFound();
+                }
+
+                return Ok(goodsOut);
             }
-
-            var user = _userRepository.getUser(authUserId);
-            int? branchId = user.BranchId;
-            int? OrganizationId = user.OrganizationId;
-
-
-
-            var goodsOut = await _GoodsOutRepository.getGoodsOut(OrganizationId.Value, null, pageNumber, pageSize);
-
-            if (goodsOut.TotalCount == null || !goodsOut.Results.Any())
-            {
-                return NotFound();
-            }
-
-            return Ok(goodsOut);
-        }
 
 
 

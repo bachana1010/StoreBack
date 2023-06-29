@@ -20,7 +20,7 @@ namespace StoreBack.Repositories
         // Task<List<User>> GetUsers( int OrganizationId);
         Task<int> MakeGoodsIn(MakeGoodsInViewModel model, User user);
         GetBarcodeViewModel getBarcode(string  barcodetext);
-        Task<PagedResult<GetGoodsinViewModel>> GetGoodsIn(int organizationId, int? branchId, int pageNumber = 1, int pageSize = 5);
+        Task<PagedResult<GetGoodsinViewModel>> GetGoodsIn(int organizationId, int? branchId = null, string quantityOperator = null, decimal? quantityValue = null, DateTime? dateFrom = null, DateTime? dateTo = null, int pageNumber = 1, int pageSize = 5);
 
     }
     
@@ -111,59 +111,78 @@ namespace StoreBack.Repositories
         }
 
 
-        //goodsin list for manager
-            public async Task<PagedResult<GetGoodsinViewModel>> GetGoodsIn(int OrganizationId, int? branchId, int pageNumber = 1, int pageSize = 5)
-        {
-            List<GetGoodsinViewModel> goodsinList = new List<GetGoodsinViewModel>();
-            int totalCount = 0;
-            
-            Console.WriteLine(OrganizationId);
-            Console.WriteLine(pageNumber);
-            Console.WriteLine(pageSize);
-            
-            using (SqlConnection conn = new SqlConnection(connection))
+        public async Task<PagedResult<GetGoodsinViewModel>> GetGoodsIn(int OrganizationId, int? branchId = null, string quantityOperator = null, decimal? quantityValue = null, DateTime? dateFrom = null, DateTime? dateTo = null, int pageNumber = 1, int pageSize = 5)
             {
-                conn.Open();
-                SqlCommand cmd = new SqlCommand();
-                cmd.Connection = conn;
-                cmd.CommandType = CommandType.StoredProcedure;
-                cmd.CommandText = "GetGoodsIn";
+                List<GetGoodsinViewModel> goodsinList = new List<GetGoodsinViewModel>();
+                int totalCount = 0;
 
-                cmd.Parameters.Add("@OrganizationId", SqlDbType.Int).Value = OrganizationId;
-                cmd.Parameters.Add("@PageNumber", SqlDbType.Int).Value = pageNumber;
-                cmd.Parameters.Add("@PageSize", SqlDbType.Int).Value = pageSize;
+                Console.WriteLine(OrganizationId);
+                Console.WriteLine(pageNumber);
+                Console.WriteLine(pageSize);
 
-                if(branchId.HasValue) // Only add the BranchId parameter if it has a value.
+                using (SqlConnection conn = new SqlConnection(connection))
                 {
-                cmd.Parameters.Add("@BranchId", SqlDbType.Int).Value = branchId.Value;
-                }
+                    conn.Open();
+                    SqlCommand cmd = new SqlCommand();
+                    cmd.Connection = conn;
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.CommandText = "GetGoodsIn";
 
-                using (SqlDataReader reader = cmd.ExecuteReader())
-                {
-                    while (reader.Read())
+                    cmd.Parameters.Add("@OrganizationId", SqlDbType.Int).Value = OrganizationId;
+                    cmd.Parameters.Add("@PageNumber", SqlDbType.Int).Value = pageNumber;
+                    cmd.Parameters.Add("@PageSize", SqlDbType.Int).Value = pageSize;
+
+                    if(branchId.HasValue) // Only add the BranchId parameter if it has a value.
                     {
-                        GetGoodsinViewModel goodsinVM = new GetGoodsinViewModel
-                        {
-                            Quantity = reader.GetFloat(reader.GetOrdinal("Quantity")),
-                            EntryDate = reader.GetDateTime(reader.GetOrdinal("EntryDate")),
-                            BranchName = reader.GetString(reader.GetOrdinal("BranchName")),
-                            OperatorUserName = reader.GetString(reader.GetOrdinal("OperatorUserName")),
-                            BarcodeName = reader.GetString(reader.GetOrdinal("BarcodeName"))
-                        };
+                        cmd.Parameters.Add("@BranchId", SqlDbType.Int).Value = branchId.Value;
+                    }
 
-                        // Get the total count from the first row
-                        if (totalCount == 0)
+                    if(!string.IsNullOrEmpty(quantityOperator))
+                    {
+                        cmd.Parameters.Add("@QuantityOperator", SqlDbType.NVarChar, 1).Value = quantityOperator;
+                    }
+
+                    if(quantityValue.HasValue)
+                    {
+                        cmd.Parameters.Add("@QuantityValue", SqlDbType.Decimal).Value = quantityValue.Value;
+                    }
+
+                    if(dateFrom.HasValue)
+                    {
+                        cmd.Parameters.Add("@DateFrom", SqlDbType.DateTime2).Value = dateFrom.Value;
+                    }
+
+                    if(dateTo.HasValue)
+                    {
+                        cmd.Parameters.Add("@DateTo", SqlDbType.DateTime2).Value = dateTo.Value;
+                    }
+
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
                         {
-                            totalCount = reader.GetInt32(reader.GetOrdinal("TotalCount"));
+                            GetGoodsinViewModel goodsinVM = new GetGoodsinViewModel
+                            {
+                                Quantity = reader.GetFloat(reader.GetOrdinal("Quantity")),
+                                EntryDate = reader.GetDateTime(reader.GetOrdinal("EntryDate")),
+                                BranchName = reader.GetString(reader.GetOrdinal("BranchName")),
+                                OperatorUserName = reader.GetString(reader.GetOrdinal("OperatorUserName")),
+                                BarcodeName = reader.GetString(reader.GetOrdinal("BarcodeName"))
+                            };
+
+                            // Get the total count from the first row
+                            if (totalCount == 0)
+                            {
+                                totalCount = reader.GetInt32(reader.GetOrdinal("TotalCount"));
+                            }
+
+                            goodsinList.Add(goodsinVM);
                         }
-
-                        goodsinList.Add(goodsinVM);
                     }
                 }
+                
+                return new PagedResult<GetGoodsinViewModel> { Results = goodsinList, TotalCount = totalCount };
             }
-            
-            return new PagedResult<GetGoodsinViewModel> { Results = goodsinList, TotalCount = totalCount };
-        }
 
 
 }
