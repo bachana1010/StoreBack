@@ -109,9 +109,12 @@ namespace StoreBack.Controllers
         [HttpGet("")]
         [Authorize]
         [Role("administrator")]
-        public async Task<IActionResult> GetBranches([FromQuery] BranchFilterViewModel filter, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 5)
+        public async Task<IActionResult> GetBranches([FromQuery] string? BrancheName, [FromQuery] string? Username, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 5)
         {
-            var authUserIdString = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+ Console.WriteLine($"BrancheName: {BrancheName}");
+
+                Console.WriteLine($"BrancheName: {Username}");
+                            var authUserIdString = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
 
             if (!int.TryParse(authUserIdString, out int authUserId))
             {
@@ -120,7 +123,7 @@ namespace StoreBack.Controllers
 
             User authUser = _userRepository.getUser(authUserId);
 
-            var pagedBranches = await _branchRepository.GetBranches(filter, authUser.OrganizationId, pageNumber, pageSize);
+            var pagedBranches = await _branchRepository.GetBranches(BrancheName, Username, authUser.OrganizationId, pageNumber, pageSize);
 
             return Ok(new 
             { 
@@ -128,6 +131,7 @@ namespace StoreBack.Controllers
                 TotalCount = pagedBranches.TotalCount 
             });
         }
+
 
 
 
