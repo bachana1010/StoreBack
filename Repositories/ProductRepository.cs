@@ -13,10 +13,19 @@ using System; // Make sure to import the System namespace
 namespace StoreBack.Repositories
 {
     public interface IProductRepository
-    {
-        Task<PagedResult<GetBarcodeBalanceViewModel>> ProductBalance(int? BranchId = null,int? OrganizationId = null,int pageNumber = 1, int pageSize = 5);
+            {
+        Task<PagedResult<GetBarcodeBalanceViewModel>> ProductBalance(
+        int? BranchId = null,
+            int? OrganizationId = null,
+            string name = null,
+            string priceOperator = null,
+            decimal? priceValue = null,
+            string quantityOperator = null,
+            decimal? quantityValue = null,
+            int pageNumber = 1, 
+            int pageSize = 5);
 
-    }
+            }
 
     
     public class ProductRepository : IProductRepository
@@ -35,132 +44,79 @@ namespace StoreBack.Repositories
 
         //get product operator
    
-            public async Task<PagedResult<GetBarcodeBalanceViewModel>> ProductBalance(int? BranchId = null, int? OrganizationId = null,  int pageNumber = 1, int pageSize = 5)
+public async Task<PagedResult<GetBarcodeBalanceViewModel>> ProductBalance(
+    int? BranchId = null,
+    int? OrganizationId = null,
+    string name = null,
+    string priceOperator = null,
+    decimal? priceValue = null,
+    string quantityOperator = null,
+    decimal? quantityValue = null,
+    int pageNumber = 1, 
+    int pageSize = 5)
+{
+    List<GetBarcodeBalanceViewModel> products = new List<GetBarcodeBalanceViewModel>();
+    int totalCount = 0;
+
+    using (SqlConnection conn = new SqlConnection(connection))
+    {
+        conn.Open();
+        SqlCommand cmd = new SqlCommand();
+        cmd.Connection = conn;
+        cmd.CommandType = CommandType.StoredProcedure;
+        cmd.CommandText = "GetBarcodeWithBalance";
+
+        cmd.Parameters.Add("@BranchId", SqlDbType.Int).Value = (object)BranchId ?? DBNull.Value;
+        cmd.Parameters.Add("@OrganizationId", SqlDbType.Int).Value = (object)OrganizationId ?? DBNull.Value;
+        cmd.Parameters.Add("@Name", SqlDbType.NVarChar, 255).Value = (object)name ?? DBNull.Value;
+        cmd.Parameters.Add("@PriceOperator", SqlDbType.NVarChar, 1).Value = (object)priceOperator ?? DBNull.Value;
+        cmd.Parameters.Add("@PriceValue", SqlDbType.Decimal).Value = (object)priceValue ?? DBNull.Value;
+        cmd.Parameters.Add("@QuantityOperator", SqlDbType.NVarChar, 1).Value = (object)quantityOperator ?? DBNull.Value;
+        cmd.Parameters.Add("@QuantityValue", SqlDbType.Decimal).Value = (object)quantityValue ?? DBNull.Value;
+        cmd.Parameters.Add("@pageNumber", SqlDbType.Int).Value = pageNumber;
+        cmd.Parameters.Add("@pageSize", SqlDbType.Int).Value = pageSize;
+
+        using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
         {
-            List<GetBarcodeBalanceViewModel> products = new List<GetBarcodeBalanceViewModel>();
-            int totalCount = 0;
-
-            using (SqlConnection conn = new SqlConnection(connection))
+            while (reader.Read())
             {
-                conn.Open();
-                SqlCommand cmd = new SqlCommand();
-                cmd.Connection = conn;
-                cmd.CommandType = CommandType.StoredProcedure;
-                cmd.CommandText = "GetBarcodeWithBalance";
-
-                cmd.Parameters.Add("@BranchId", SqlDbType.Int).Value = (object)BranchId ?? DBNull.Value;
-                cmd.Parameters.Add("@OrganizationId", SqlDbType.Int).Value = (object)OrganizationId ?? DBNull.Value;
-                cmd.Parameters.Add("@pageNumber", SqlDbType.Int).Value = pageNumber;
-                cmd.Parameters.Add("@pageSize", SqlDbType.Int).Value = pageSize;
-
-                using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
+                GetBarcodeBalanceViewModel productBalance = new GetBarcodeBalanceViewModel
                 {
-                    while (reader.Read())
+                    Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                    Barcode = reader.GetString(reader.GetOrdinal("Barcode")),
+                    Name = reader.GetString(reader.GetOrdinal("Name")),
+                    Unit = reader.GetString(reader.GetOrdinal("Unit")),
+                    Price = reader.GetFloat(reader.GetOrdinal("Price")),
+                    Quantity = reader.GetFloat(reader.GetOrdinal("Quantity")),
+                };
+
+                try
+                {
+                    int ordinal = reader.GetOrdinal("BranchName");
+
+                    if (!reader.IsDBNull(ordinal))
                     {
-                        GetBarcodeBalanceViewModel productBalance = new GetBarcodeBalanceViewModel
-                        {
-                            Id = reader.GetInt32(reader.GetOrdinal("Id")),
-                            Barcode = reader.GetString(reader.GetOrdinal("Barcode")),
-                            Name = reader.GetString(reader.GetOrdinal("Name")),
-                            Unit = reader.GetString(reader.GetOrdinal("Unit")),
-                            Price = reader.GetFloat(reader.GetOrdinal("Price")),
-                            Quantity = reader.GetFloat(reader.GetOrdinal("Quantity")),
-                        };
-
-                        try
-                        {
-                            int ordinal = reader.GetOrdinal("BranchName");
-
-                            if (!reader.IsDBNull(ordinal))
-                            {
-                                productBalance.BranchName = reader.GetString(ordinal);
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-                            Console.WriteLine($"Error reading BranchName: {ex.Message}");
-                        }
-
-                        if (totalCount == 0)
-                        {
-                            totalCount = reader.GetInt32(reader.GetOrdinal("TotalCount"));
-                        }
-                        products.Add(productBalance);
+                        productBalance.BranchName = reader.GetString(ordinal);
                     }
                 }
-            }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error reading BranchName: {ex.Message}");
+                }
 
-            return new PagedResult<GetBarcodeBalanceViewModel> { Results = products, TotalCount = totalCount };
+                if (totalCount == 0)
+                {
+                    totalCount = reader.GetInt32(reader.GetOrdinal("TotalCount"));
+                }
+                products.Add(productBalance);
+            }
         }
+    }
+
+    return new PagedResult<GetBarcodeBalanceViewModel> { Results = products, TotalCount = totalCount };
+}
 
     
-
-
-        // //make products by manager
-
-        // public async Task<PagedResult<getBalanceManagerViewModels>> BalanceManager(int OrganizationId, int? branchId, int pageNumber = 1, int pageSize = 5)
-
-        // {
-        //     // getBalanceManagerViewModels productBalance = null;
-        //     List<getBalanceManagerViewModels> products = new List<getBalanceManagerViewModels>();
-        //     int totalCount = 0;
-
-
-        //     using (SqlConnection conn = new SqlConnection(connection))
-        //     {
-        //         conn.Open();
-        //         SqlCommand cmd = new SqlCommand();
-        //         cmd.Connection = conn;
-        //         cmd.CommandType = CommandType.StoredProcedure;
-        //         cmd.CommandText = "GetManagerBalance";
-
-        //         cmd.Parameters.Add("@OrganizationId", SqlDbType.Int).Value = OrganizationId;
-        //         cmd.Parameters.Add("@PageNumber", SqlDbType.Int).Value = pageNumber;
-        //         cmd.Parameters.Add("@PageSize", SqlDbType.Int).Value = pageSize;
-        //         if(branchId.HasValue)
-        //         {
-        //             cmd.Parameters.Add("@branchId", SqlDbType.Int).Value = branchId.Value;
-        //         }
-        //         using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
-        //         {
-        //             while (reader.Read())
-        //             {
-        //                 getBalanceManagerViewModels productBalance = new getBalanceManagerViewModels
-        //                 {
-        //                     Barcode = reader.GetString(reader.GetOrdinal("Barcode")),
-        //                     Name = reader.GetString(reader.GetOrdinal("Name")),
-        //                     Unit = reader.GetString(reader.GetOrdinal("Unit")),
-        //                     Price = reader.GetFloat(reader.GetOrdinal("Price")),
-        //                     Quantity = reader.GetFloat(reader.GetOrdinal("Quantity")),
-        //                 };
-
-        //                 // Check if the BrancheName column is not null before assigning it
-        //                 try
-        //                 {
-        //                     int ordinal = reader.GetOrdinal("BranchName");
-
-        //                     if (!reader.IsDBNull(ordinal))
-        //                     {
-        //                         productBalance.BrancheName = reader.GetString(ordinal);
-        //                     }
-        //                 }
-        //                 catch (Exception ex)
-        //                 {
-        //                     Console.WriteLine($"Error reading BrancheName: {ex.Message}");
-        //                 }
-
-        //                 if (totalCount == 0)
-        //                 {
-        //                     totalCount = reader.GetInt32(reader.GetOrdinal("TotalCount"));
-        //                 }
-        //                 products.Add(productBalance);
-        //             }
-        //         }
-        //     }
-
-        //         return new PagedResult<getBalanceManagerViewModels> { Results = products, TotalCount = totalCount };
-        // }
-
 
 
 
