@@ -80,10 +80,11 @@ namespace StoreBack.Repositories
         }
 
 
-        //addUser
+      //addUser
         public async Task<int> AddUser(AddUserViewModel model, User user)
         {
             Console.WriteLine(model.Password);
+            Console.WriteLine(model.ToString());
             using (SqlConnection conn = new SqlConnection(connection))
             {
                 conn.Open();
@@ -99,7 +100,9 @@ namespace StoreBack.Repositories
                 cmd.Parameters.Add("@PasswordHash", SqlDbType.NVarChar).Value = BC.HashPassword(model.Password);
                 cmd.Parameters.Add("@Role", SqlDbType.NVarChar).Value = model.Role;
                 cmd.Parameters.Add("@OrganizationId", SqlDbType.NVarChar).Value = user.OrganizationId;
-                cmd.Parameters.Add("@BranchId", SqlDbType.NVarChar).Value = model.BranchId;
+
+                // Check if BranchId is not null, otherwise set to DBNull.Value
+                cmd.Parameters.Add("@BranchId", SqlDbType.Int).Value = (object)model.BranchId ?? DBNull.Value;
 
                 var userIdParam = new SqlParameter("@userId", SqlDbType.Int)
                 {
@@ -114,6 +117,7 @@ namespace StoreBack.Repositories
                 return userId;
             }
         }
+
 
 
         //update

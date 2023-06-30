@@ -21,6 +21,8 @@ public class AddUserViewModel
     [Required]
     public string Role { get; set; }
 
-    public int? BranchId {get; set;}
+    public int? BranchId { get; set; }
 }
+
+
 }

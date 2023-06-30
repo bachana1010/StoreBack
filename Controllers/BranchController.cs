@@ -111,7 +111,7 @@ namespace StoreBack.Controllers
         [Role("administrator")]
         public async Task<IActionResult> GetBranches([FromQuery] string? BrancheName, [FromQuery] string? Username, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 5)
         {
- Console.WriteLine($"BrancheName: {BrancheName}");
+//  Console.WriteLine($"BrancheName: {BrancheName}");
 
                 Console.WriteLine($"BrancheName: {Username}");
                             var authUserIdString = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;

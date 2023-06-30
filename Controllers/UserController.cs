@@ -36,6 +36,7 @@ namespace StoreBack.Controllers
         [Role("administrator")]
         public async Task<IActionResult> CreateUser([FromBody] AddUserViewModel model)
         {
+            Console.WriteLine(model.ToString());
             var authUserIdString = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
 
             if (!int.TryParse(authUserIdString, out int authUserId))
@@ -56,6 +57,7 @@ namespace StoreBack.Controllers
                 return BadRequest(new { error = e.Message });
             }
         }
+
 
         [HttpPut("{id}")]
         [Authorize]
