@@ -11,7 +11,7 @@ namespace StoreBack.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.Sql(@"
-                CREATE PROCEDURE GetUsers(Int @OrganizationId int)
+                CREATE PROCEDURE GetUsers( @OrganizationId Int)
                 AS
                 BEGIN
                     SELECT * FROM Users 

@@ -67,6 +67,32 @@ namespace StoreBack.Controllers
             return Ok(products);
         }
 
+        [HttpGet("dashboard")]
+        [Authorize]
+        [Role("administrator")]        
+        
+        public async Task<IActionResult> GetDashboardData()
+        {
+
+            var authUserIdString = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+
+            if (!int.TryParse(authUserIdString, out int authUserId))
+            {
+                return BadRequest("Invalid user ID");
+            }
+
+            var user = _userRepository.getUser(authUserId);
+
+            if (user.OrganizationId == null)
+            {
+                return BadRequest("OrganizationId for user is null");
+            }
+
+            var dashboardData = await _ProductRepository.GetDashboardData((int)user.OrganizationId);
+
+            return Ok(dashboardData);
+        }
+
 
 
 }}

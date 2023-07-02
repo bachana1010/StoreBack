@@ -7,14 +7,8 @@ namespace StoreBack.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             var createProcSql = @"
-                IF EXISTS (SELECT * FROM sys.objects WHERE type = 'P' AND OBJECT_ID = OBJECT_ID('dbo.GetBarcodeWithBalance'))
-                    DROP PROCEDURE dbo.GetBarcodeWithBalance
-                GO
-
-                SET ANSI_NULLS ON
-                SET QUOTED_IDENTIFIER ON
-
-                CREATE PROCEDURE [dbo].[GetBarcodeWithBalance](
+             
+                CREATE OR ALTER PROCEDURE [dbo].[GetBarcodeWithBalance](
                     @OrganizationId int = NULL,
                     @BranchId INT = NULL,
                     @Name nvarchar(255) = NULL,

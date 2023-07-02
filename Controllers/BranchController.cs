@@ -173,12 +173,14 @@ namespace StoreBack.Controllers
                 return BadRequest("Invalid user ID");
             }
 
+              var branch = _branchRepository.GetBranch(id);
+
             // You may want to add a condition to check if the user has permission to update the resource
             // For example, if the user can only update their own profile:
-            if(authUserId == id)
-            {
-                return Unauthorized("You do not have permission to update this resource");
-            }
+            // if(branch.OrganizationId != authUserId)
+            // {
+            //     return Unauthorized("You do not have permission to update this resource");
+            // }
 
 
             try

@@ -24,6 +24,7 @@ namespace StoreBack.Repositories
             decimal? quantityValue = null,
             int pageNumber = 1, 
             int pageSize = 5);
+        Task<DashboardDataViewModel> GetDashboardData(int organizationId);
 
             }
 
@@ -117,6 +118,39 @@ public async Task<PagedResult<GetBarcodeBalanceViewModel>> ProductBalance(
 }
 
     
+
+
+        public async Task<DashboardDataViewModel> GetDashboardData(int organizationId)
+        {
+            using (SqlConnection conn = new SqlConnection(connection))
+            {
+                await conn.OpenAsync();
+
+                SqlCommand cmd = new SqlCommand("GetDashboardData", conn)
+                {
+                    CommandType = CommandType.StoredProcedure
+                };
+                cmd.Parameters.Add(new SqlParameter("@OrganizationId", organizationId));
+
+                var result = new DashboardDataViewModel();
+                using (var reader = await cmd.ExecuteReaderAsync())
+                {
+                    var schemaTable = reader.GetSchemaTable();
+
+                     while (await reader.ReadAsync())
+                        {
+                            result.UserCount = reader.GetInt32(reader.GetOrdinal("UserCount"));
+                            result.OperatorCount = reader.GetInt32(reader.GetOrdinal("OperatorCount"));
+                            result.ManagerCount = reader.GetInt32(reader.GetOrdinal("ManagerCount"));
+                            result.GoodsInCount = reader.GetInt32(reader.GetOrdinal("GoodsInCount"));
+                            result.GoodsOutCount = reader.GetInt32(reader.GetOrdinal("GoodsOutCount"));
+                            result.ProductCount = reader.GetInt32(reader.GetOrdinal("ProductCount"));
+                            result.BranchCount = reader.GetInt32(reader.GetOrdinal("BranchCount"));
+                        }
+                }
+                return result;
+            }
+        }
 
 
 
