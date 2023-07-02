@@ -290,3 +290,8 @@
 /home/badri/1-RsStore/StoreBack/bin/Debug/net7.0/runtimes/win/lib/net6.0/System.Security.Cryptography.ProtectedData.dll
 /home/badri/1-RsStore/StoreBack/bin/Debug/net7.0/runtimes/win/lib/net6.0/System.Windows.Extensions.dll
 /home/badri/1-RsStore/StoreBack/bin/Debug/net7.0/BCrypt.Net-Next.dll
+/home/badri/1-RsStore/StoreBack/bin/Debug/net7.0/BouncyCastle.Cryptography.dll
+/home/badri/1-RsStore/StoreBack/bin/Debug/net7.0/MailKit.dll
+/home/badri/1-RsStore/StoreBack/bin/Debug/net7.0/MimeKit.dll
+/home/badri/1-RsStore/StoreBack/bin/Debug/net7.0/System.Security.Cryptography.Pkcs.dll
+/home/badri/1-RsStore/StoreBack/bin/Debug/net7.0/runtimes/win/lib/net7.0/System.Security.Cryptography.Pkcs.dll

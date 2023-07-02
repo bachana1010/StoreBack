@@ -42,6 +42,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddControllers();
+
 builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(policy =>
@@ -89,6 +90,7 @@ builder.Services.AddScoped<IBranchRepository, BranchRepository>();
 builder.Services.AddScoped<IGoodsinRepository, GoodsinRepository>();
 builder.Services.AddScoped<IGoodsOutRepository, GoodsOutRepository>();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
+// builder.Services.AddTransient<EmailService>();
 
 
 
