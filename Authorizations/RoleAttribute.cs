@@ -25,17 +25,17 @@ public class RoleAttribute : TypeFilterAttribute
         {
             var user = context.HttpContext.User;
 
-            // Check if the user is authenticated
+            // authenticasiis shemowmeba
             if (!user.Identity.IsAuthenticated)
             {
                 context.Result = new StatusCodeResult(StatusCodes.Status401Unauthorized);
                 return;
             }
 
-            // Get the user's roles from the claims
+            // claimidan rolis amogeba
             var userRoles = user.FindAll(ClaimTypes.Role).Select(c => c.Value);
 
-            // Check if the user's role matches any of the required roles
+            // tu emtxveva rols shemowmeba
             if (!_roles.Any(role => userRoles.Contains(role)))
             {
                 context.Result = new StatusCodeResult(StatusCodes.Status403Forbidden);

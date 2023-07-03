@@ -1,15 +1,10 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Collections.Generic; // Required for ICollection
+using System.Collections.Generic; 
 
 namespace StoreBack.Models {
 
-    // public enum Role
-    // {
-    //     Administrator,
-    //     Operator,
-    //     Manager
-    // }
+
 
     public class User
     {
@@ -35,12 +30,10 @@ namespace StoreBack.Models {
 
         public DateTime? DeletedAt { get; set; }
 
-        // Navigation properties
         public Organization Organization { get; set; }
 
         public Branches Branch { get; set; }
 
-        // Add this line
         public ICollection<Branches> Branches { get; set; }
     }
 }

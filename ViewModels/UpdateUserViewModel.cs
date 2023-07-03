@@ -9,7 +9,6 @@ public class UpdateserViewModel
     [Required]
     public string UserName { get; set; }
 
-    // Removed [Required] from Password
     public string? Password { get; set; }
 
     [Required]

@@ -29,12 +29,14 @@ namespace StoreBack.Controllers
 
     }
 
+
+    //registratia
     [HttpPost("register")]
     public async Task<IActionResult> RegisterUser([FromBody] RegisterOrganizationViewModel model)
     {
         try
         {
-            // Hash the password before sending it
+            // password-is heshireba
             model.Password = BC.HashPassword(model.Password);
 
             var userId = await _authRepository.RegisterOrganizationAndUser(model);
@@ -46,6 +48,8 @@ namespace StoreBack.Controllers
             return BadRequest(new { error = e.Message });
         }
     }
+
+    //dalogineba
      
        [HttpPost("login")]
         public async Task<IActionResult> LoginUser([FromBody] StoreBack.ViewModels.LoginRequest model)
@@ -59,9 +63,11 @@ namespace StoreBack.Controllers
                     return Unauthorized();
                 }
 
+                //tokeni
                 var tokenHandler = new JwtSecurityTokenHandler();
                 var key = Encoding.ASCII.GetBytes(_jwtSettings.Secret);
 
+                //claimsi generireba
                 var claims = new[]
                 {
                     new Claim("sub", user.Id.ToString()),
@@ -71,6 +77,8 @@ namespace StoreBack.Controllers
                     new Claim("organizationId", user.OrganizationId.ToString()),
                     new Claim("role", user.Role.ToString())
                 };
+
+                //claimis chadeba
 
                 var tokenDescriptor = new SecurityTokenDescriptor
                 {

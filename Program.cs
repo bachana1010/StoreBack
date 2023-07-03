@@ -56,14 +56,13 @@ builder.Services.AddSwaggerGen(c =>
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "My API", Version = "v1" });
 
 
-        // Define the BearerAuth scheme
         c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
         {
             Description = "JWT Authorization header using the Bearer scheme. Example: \"Bearer {token}\"",
             Name = "Authorization",
             In = ParameterLocation.Header,
             Type = SecuritySchemeType.Http,
-            Scheme = "bearer" // must be lower case
+            Scheme = "bearer" 
         });
 
         c.AddSecurityRequirement(new OpenApiSecurityRequirement
@@ -90,7 +89,6 @@ builder.Services.AddScoped<IBranchRepository, BranchRepository>();
 builder.Services.AddScoped<IGoodsinRepository, GoodsinRepository>();
 builder.Services.AddScoped<IGoodsOutRepository, GoodsOutRepository>();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
-// builder.Services.AddTransient<EmailService>();
 
 
 

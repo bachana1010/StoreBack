@@ -8,7 +8,7 @@ using Microsoft.Extensions.Configuration;
 using BC = BCrypt.Net.BCrypt;
 using System.Data;
 using System.Collections.Generic;
-using System; // Make sure to import the System namespace
+using System; 
 
 namespace StoreBack.Repositories
 {
@@ -56,6 +56,7 @@ public async Task<PagedResult<GetBarcodeBalanceViewModel>> ProductBalance(
     int pageNumber = 1, 
     int pageSize = 5)
 {
+    
     List<GetBarcodeBalanceViewModel> products = new List<GetBarcodeBalanceViewModel>();
     int totalCount = 0;
 
@@ -68,7 +69,9 @@ public async Task<PagedResult<GetBarcodeBalanceViewModel>> ProductBalance(
         cmd.CommandText = "GetBarcodeWithBalance";
 
         cmd.Parameters.Add("@BranchId", SqlDbType.Int).Value = (object)BranchId ?? DBNull.Value;
+        // cmd.Parameters.Add("@OrganizationId", SqlDbType.Int).Value = (object)OrganizationId ?? DBNull.Value;
         cmd.Parameters.Add("@OrganizationId", SqlDbType.Int).Value = (object)OrganizationId ?? DBNull.Value;
+
         cmd.Parameters.Add("@Name", SqlDbType.NVarChar, 255).Value = (object)name ?? DBNull.Value;
         cmd.Parameters.Add("@PriceOperator", SqlDbType.NVarChar, 1).Value = (object)priceOperator ?? DBNull.Value;
         cmd.Parameters.Add("@PriceValue", SqlDbType.Decimal).Value = (object)priceValue ?? DBNull.Value;

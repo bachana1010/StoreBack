@@ -22,7 +22,6 @@ public class Barcodes
     [ForeignKey("Organization")]
     public int OrganizationId { get; set; }
 
-    // Navigation properties
 
     [NotMapped]
     public Branches Branch { get; set; }

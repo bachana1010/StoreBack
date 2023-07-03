@@ -9,7 +9,7 @@ public class Branches
     public string BrancheName { get; set; }
     public int AddedByUserId { get; set; }
 
-    public DateTime? DeletedAt { get; set; }  // New property
+    public DateTime? DeletedAt { get; set; }  
 
     [NotMapped]
     public User? AddedByUser { get; set; }

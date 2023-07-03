@@ -31,12 +31,15 @@ namespace StoreBack.Controllers
             _userRepository = userRepository;
         }
 
+        //goodsinis damateba
+
         [HttpPost("")]
         [Authorize]
         [Role("operator")]
         
         public async Task<IActionResult> AddGoodSin([FromBody] MakeGoodsInViewModel model)
         {
+            //igive procesi
             var authUserIdString = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
 
             if (!int.TryParse(authUserIdString, out int authUserId))
@@ -44,8 +47,9 @@ namespace StoreBack.Controllers
                 return BadRequest("Invalid user ID");
             }
 
+
+            //useris amogeba
             var user = _userRepository.getUser(authUserId);
-            Console.WriteLine(user);
 
               if (user == null)
                 {
@@ -63,6 +67,8 @@ namespace StoreBack.Controllers
                 return BadRequest(new { error = e.Message });
             }
         }
+
+
 
         //getbarcodes
 
@@ -95,30 +101,25 @@ namespace StoreBack.Controllers
         {
             try
             {
-                // Log the start of the call
-                Console.WriteLine("GetGoodsin started");
-                Console.WriteLine(quantity);
-                        Console.WriteLine(quantityOperator);
-                                        Console.WriteLine(pageNumber);
-
-
-
-
-                // Add validation for pageNumber and pageSize
+               
+                // paginationis damateba
                 if(pageNumber < 1 || pageSize < 1)
                 {
                     return BadRequest("Invalid pageNumber or pageSize");
                 }
 
+                //aqac igive procesi
                 var authUserIdString = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
                 if (!int.TryParse(authUserIdString, out int authUserId))
                 {
                     return BadRequest("Invalid user ID");
                 }
 
+                //useris amogeba da organzzation id-is
                 var user = _userRepository.getUser(authUserId);
                 int? userOrganizationId = user.OrganizationId;
 
+                //repositorishi gadasrola
                 var goodsIn = await _GoodsinRepository.GetGoodsIn(userOrganizationId.Value, branchId, quantityOperator, quantity, dateFrom, dateTo, pageNumber, pageSize);
 
                 if (goodsIn.TotalCount == null || !goodsIn.Results.Any())
@@ -126,17 +127,13 @@ namespace StoreBack.Controllers
                     return NotFound();
                 }
 
-                // Log the end of the call
-                Console.WriteLine("GetGoodsin finished");
+      
 
                 return Ok(goodsIn);
             }
             catch(Exception e)
             {
-                // Log the exception
-                Console.WriteLine($"GetGoodsin failed with exception: {e.Message}");
 
-                // Return server error status code with exception message
                 return StatusCode(500, e.Message);
             }
         }

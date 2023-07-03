@@ -30,6 +30,7 @@ namespace StoreBack.Controllers
             _userRepository = userRepository;
         }
         
+        //product list
         [HttpGet]
         [Authorize]
         [Role("operator", "manager")]
@@ -53,6 +54,7 @@ namespace StoreBack.Controllers
 
             PagedResult<GetBarcodeBalanceViewModel> products = new PagedResult<GetBarcodeBalanceViewModel>();
 
+            //rolebis shemowmeba romeli rolia
             if (user.Role == "operator") {
                 products = await _ProductRepository.ProductBalance(user.BranchId, null, name, priceOperator, priceValue, quantityOperator, quantityValue, pageNumber, pageSize);
             } else if (user.Role == "manager") {
@@ -67,6 +69,7 @@ namespace StoreBack.Controllers
             return Ok(products);
         }
 
+        //dashbordistvis listebis gadacema, cardebistvis
         [HttpGet("dashboard")]
         [Authorize]
         [Role("administrator")]        

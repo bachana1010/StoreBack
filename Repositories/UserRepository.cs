@@ -66,14 +66,13 @@ namespace StoreBack.Repositories
                                 (int?)null : 
                                 reader.GetInt32(reader.GetOrdinal("BranchId"))
 
-                            // fill out other properties if necessary
                         };
 
                         return user;
                     }
                     else
                     {
-                        return null; // or throw an exception, depending on your needs
+                        return null; 
                     }
                 }
             }
@@ -101,7 +100,6 @@ namespace StoreBack.Repositories
                 cmd.Parameters.Add("@Role", SqlDbType.NVarChar).Value = model.Role;
                 cmd.Parameters.Add("@OrganizationId", SqlDbType.NVarChar).Value = user.OrganizationId;
 
-                // Check if BranchId is not null, otherwise set to DBNull.Value
                 cmd.Parameters.Add("@BranchId", SqlDbType.Int).Value = (object)model.BranchId ?? DBNull.Value;
 
                 var userIdParam = new SqlParameter("@userId", SqlDbType.Int)

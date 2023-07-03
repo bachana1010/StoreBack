@@ -21,9 +21,8 @@ namespace StoreBack.Models {
         [ForeignKey("Users")]
         public int UserId { get; set; }
 
-        public DateTime? Revoked { get; set; } // This should be nullable
+        public DateTime? Revoked { get; set; } 
 
-        // Navigation property
         public virtual User User { get; set; }
     }
 }

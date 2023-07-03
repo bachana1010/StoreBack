@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Collections.Generic; // Required for ICollection
+using System.Collections.Generic;
 
 namespace StoreBack.Models {
 
@@ -17,9 +17,7 @@ namespace StoreBack.Models {
 
         public string Email { get; set; }
 
-        // Navigation properties
-
-        // Add this line
+   
         public ICollection<User> Users { get; set; }
         public ICollection<Branches> Branches { get; set; }
     }

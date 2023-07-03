@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Collections.Generic; // Required for ICollection
+using System.Collections.Generic; 
 
 namespace StoreBack.Models {
 

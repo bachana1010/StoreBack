@@ -32,6 +32,8 @@ namespace StoreBack.Controllers
         }
 
 
+
+        //goodsoutis damateba
         [HttpPost("")]
         [Authorize]
         [Role("operator")]
@@ -45,7 +47,6 @@ namespace StoreBack.Controllers
             }
 
             var user = _userRepository.getUser(authUserId);
-            Console.WriteLine(user);
 
             if (user == null)
             {
@@ -60,10 +61,10 @@ namespace StoreBack.Controllers
             }
             catch (Exception e)
             {
-                // If there's an exception, return a BadRequest with the error message
                 return BadRequest(new { error = e.Message });
             }
         }
+
 
            //getGoodOut
             [HttpGet]

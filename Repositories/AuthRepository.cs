@@ -66,11 +66,11 @@ namespace StoreBack.Repositories
             }
             catch (SqlException ex)
             {
-                if (ex.Number == 2601) // Unique constraint error number
+                if (ex.Number == 2601) 
                 {
                     throw new Exception("Email already exists.", ex);
                 }
-                else if (ex.Number == 515) // Null insertion error number
+                else if (ex.Number == 515) 
                 {
                     throw new Exception("OrganizationId is null.", ex);
                 }
@@ -113,11 +113,11 @@ namespace StoreBack.Repositories
                             bool validPassword = BC.Verify(password, user.PasswordHash);
                             if (validPassword)
                             {
-                                // Generate refresh token
+                                // refresh toqeni dasamtavrbelia
                                 RefreshTokens refreshToken = new RefreshTokens
                                 {
-                                    Token = Guid.NewGuid().ToString(), // You can use any method for generating token
-                                    Expires = DateTime.UtcNow.AddDays(7), // Set token to expire after 7 days
+                                    Token = Guid.NewGuid().ToString(), 
+                                    Expires = DateTime.UtcNow.AddDays(7), 
                                     UserId = user.Id,
                                 };
 

@@ -12,12 +12,7 @@ namespace StoreBack.Repositories
 {
     public interface IGoodsOutRepository
     {
-        // Task<int> AddUser(AddUserViewModel model, User user);
-        // User getUser(int userId);
-        // Task DeleteUser(int id);
-
-        // Task UpdateUser(int id, UpdateserViewModel model);
-        // Task<List<User>> GetUsers( int OrganizationId);
+        
         Task <int> MakeGoodsOut (MakeGoodsOutViewModel model, User user);
      Task<PagedResult<GetGoodsOutViewModel>> getGoodsOut(int organizationId, int? branchId, int pageNumber = 1, int pageSize = 5, string quantityOperator = null, float? quantityValue = null, DateTime? dateFrom = null, DateTime? dateTo = null);
 
@@ -64,10 +59,9 @@ namespace StoreBack.Repositories
                         }
                     }
 
-                    // If quantity is available
                     if (isAvailable == 1)
                     {
-                        cmd.Parameters.Clear();  // Clear parameters for next command
+                        cmd.Parameters.Clear();  
                         cmd.CommandText = "MakeGoodsOut";
                         cmd.Parameters.Add("@Barcode", SqlDbType.NVarChar).Value = model.Barcode;
                         cmd.Parameters.Add("@OutQuantity", SqlDbType.Float).Value = model.Quantity;
@@ -78,7 +72,7 @@ namespace StoreBack.Repositories
                         var makeGoodsOutResult = await cmd.ExecuteScalarAsync();
                         return Convert.ToInt32(makeGoodsOutResult);
                     }
-                    else  // If quantity is not available
+                    else  
                     {
                         throw new Exception($"Insufficient quantity available. Remaining quantity: {remainingQuantity}");
                     }

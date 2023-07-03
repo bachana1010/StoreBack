@@ -4,11 +4,13 @@
 
 namespace StoreBack.Migrations
 {
-    public partial class getusersfilter : Migration
+    /// <inheritdoc />
+    public partial class getusersfilter10 : Migration
     {
+        /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.Sql(@"
+                 migrationBuilder.Sql(@"
             CREATE OR ALTER PROCEDURE GetUsers(@OrganizationId INT, @PageNumber INT = 1, @PageSize INT = 5, @Username NVARCHAR(MAX) = NULL, @Email NVARCHAR(MAX) = NULL, @Role NVARCHAR(MAX) = NULL)
             AS
             BEGIN
@@ -36,9 +38,11 @@ namespace StoreBack.Migrations
             ");
         }
 
+        /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.Sql("DROP PROCEDURE GetUsers");
+
         }
     }
 }

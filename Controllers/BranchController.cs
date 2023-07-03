@@ -77,32 +77,31 @@ namespace StoreBack.Controllers
             User authUser = _userRepository.getUser(authUserId);
             Branches branch = _branchRepository.GetBranch(BranchId);
 
-            // Add null check for user
+            // iuzeris hsemowmeba tua avgorizebuli
             if (authUser == null)
             {
                 return NotFound("Authorized user not found");
             }
 
-            // Add null check for branch
+            // brenchis hsemowmeba
             if (branch == null)
             {
                 return NotFound("Branch not found");
             }
 
-            Console.WriteLine($"Auth User Organization ID: {authUser.OrganizationId}");
-            Console.WriteLine($"Branch Organization ID: {branch.OrganizationId}");
 
-            // check if the authorized user has the same organizationId as the branch
+            
             if (authUser.OrganizationId != branch.OrganizationId)
             {
                 return Unauthorized("This user does not belong to the branch's organization");
             }
 
-            // delete the branch
+            // delete  branch
             await _branchRepository.DeleteBranch(BranchId);
 
             return Ok();
         }
+
 
 
         //get branches list
@@ -111,16 +110,15 @@ namespace StoreBack.Controllers
         [Role("administrator")]
         public async Task<IActionResult> GetBranches([FromQuery] string? BrancheName, [FromQuery] string? Username, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 5)
         {
-//  Console.WriteLine($"BrancheName: {BrancheName}");
 
-                Console.WriteLine($"BrancheName: {Username}");
-                            var authUserIdString = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+                var authUserIdString = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
 
             if (!int.TryParse(authUserIdString, out int authUserId))
             {
                 return BadRequest("Invalid user ID");
             }
 
+            //useris amogeba aidit
             User authUser = _userRepository.getUser(authUserId);
 
             var pagedBranches = await _branchRepository.GetBranches(BrancheName, Username, authUser.OrganizationId, pageNumber, pageSize);
@@ -136,7 +134,7 @@ namespace StoreBack.Controllers
 
 
 
-        //get brancheby id
+        //get branche by id
 
 
         [HttpGet("{Id}")]
@@ -151,7 +149,6 @@ namespace StoreBack.Controllers
                 return BadRequest("Invalid user ID");
             }
 
-            // User authUser = await _userRepository.getUser(authUserId);
 
              var branch = _branchRepository.GetBranch(Id);
 
@@ -173,15 +170,8 @@ namespace StoreBack.Controllers
                 return BadRequest("Invalid user ID");
             }
 
+              //branchis amogeba GetBranch - it
               var branch = _branchRepository.GetBranch(id);
-
-            // You may want to add a condition to check if the user has permission to update the resource
-            // For example, if the user can only update their own profile:
-            // if(branch.OrganizationId != authUserId)
-            // {
-            //     return Unauthorized("You do not have permission to update this resource");
-            // }
-
 
             try
             {
@@ -193,7 +183,6 @@ namespace StoreBack.Controllers
                 }
                 else
                 {
-                    // If the update method returns false (i.e., no rows were updated), return a not found status
                     return NotFound("The user was not found or no changes were made.");
                 }
             }

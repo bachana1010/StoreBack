@@ -31,12 +31,13 @@ namespace StoreBack.Controllers
             _jwtSettings = jwtSettings.Value;
         }
 
+        //user-is sheqmna
+
         [HttpPost("")]
         [Authorize]
         [Role("administrator")]
         public async Task<IActionResult> CreateUser([FromBody] AddUserViewModel model)
         {
-            Console.WriteLine(model.ToString());
             var authUserIdString = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
 
             if (!int.TryParse(authUserIdString, out int authUserId))
@@ -58,6 +59,7 @@ namespace StoreBack.Controllers
             }
         }
 
+        //user-is update
 
         [HttpPut("{id}")]
         [Authorize]
@@ -71,14 +73,12 @@ namespace StoreBack.Controllers
                 return BadRequest("Invalid user ID");
             }
 
-            // You may want to add a condition to check if the user has permission to update the resource
-            // For example, if the user can only update their own profile:
+           
             if(authUserId == id)
             {
                 return Unauthorized("You do not have permission to update this resource");
             }
 
-            // Hash password only if it exists
             if (!string.IsNullOrEmpty(model.Password))
             {
                 model.Password = BC.HashPassword(model.Password);
@@ -96,6 +96,7 @@ namespace StoreBack.Controllers
             }
 
         }
+
 
 
         //delete user
@@ -119,7 +120,6 @@ namespace StoreBack.Controllers
             }
 
         
-            // check if the authorized user is the same as the user being deleted
             if (authUserId == id)
             {
                 return Unauthorized();
@@ -171,7 +171,6 @@ namespace StoreBack.Controllers
                 return BadRequest("Invalid user ID");
             }
 
-            // User authUser = await _userRepository.getUser(authUserId);
 
              var user = _userRepository.getUser(Id);
 

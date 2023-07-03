@@ -12,12 +12,7 @@ namespace StoreBack.Repositories
 {
     public interface IGoodsinRepository
     {
-        // Task<int> AddUser(AddUserViewModel model, User user);
-        // User getUser(int userId);
-        // Task DeleteUser(int id);
-
-        // Task UpdateUser(int id, UpdateserViewModel model);
-        // Task<List<User>> GetUsers( int OrganizationId);
+      
         Task<int> MakeGoodsIn(MakeGoodsInViewModel model, User user);
         GetBarcodeViewModel getBarcode(string  barcodetext);
         Task<PagedResult<GetGoodsinViewModel>> GetGoodsIn(int organizationId, int? branchId = null, string quantityOperator = null, decimal? quantityValue = null, DateTime? dateFrom = null, DateTime? dateTo = null, int pageNumber = 1, int pageSize = 5);
@@ -59,7 +54,6 @@ namespace StoreBack.Repositories
             cmd.Parameters.Add("@OrganizationId", SqlDbType.NVarChar).Value = user.OrganizationId;
             cmd.Parameters.Add("@OperatorUserId", SqlDbType.NVarChar).Value = user.Id;
 
-            // assuming the stored procedure returns the id of the created record
             var result = await cmd.ExecuteScalarAsync();
             return (int)result;
         }
@@ -132,7 +126,7 @@ namespace StoreBack.Repositories
                     cmd.Parameters.Add("@PageNumber", SqlDbType.Int).Value = pageNumber;
                     cmd.Parameters.Add("@PageSize", SqlDbType.Int).Value = pageSize;
 
-                    if(branchId.HasValue) // Only add the BranchId parameter if it has a value.
+                    if(branchId.HasValue) 
                     {
                         cmd.Parameters.Add("@BranchId", SqlDbType.Int).Value = branchId.Value;
                     }
@@ -170,7 +164,6 @@ namespace StoreBack.Repositories
                                 BarcodeName = reader.GetString(reader.GetOrdinal("BarcodeName"))
                             };
 
-                            // Get the total count from the first row
                             if (totalCount == 0)
                             {
                                 totalCount = reader.GetInt32(reader.GetOrdinal("TotalCount"));

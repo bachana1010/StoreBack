@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
-using StoreBack.Models; //Include your models namespace here
+using StoreBack.Models; 
 
 namespace StoreBack
 {
