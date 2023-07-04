@@ -82,7 +82,7 @@ namespace StoreBack.Controllers
                 int? branchId = user.BranchId;
                 int? organizationId = user.OrganizationId;
 
-                var goodsOut = await _GoodsOutRepository.getGoodsOut(organizationId.Value, null, pageNumber, pageSize, quantityOperator, quantityValue, dateFrom, dateTo);
+                var goodsOut = await _GoodsOutRepository.getGoodsOut(organizationId.Value, branchId, pageNumber, pageSize, quantityOperator, quantityValue, dateFrom, dateTo);
 
                 if (goodsOut.TotalCount == null || !goodsOut.Results.Any())
                 {

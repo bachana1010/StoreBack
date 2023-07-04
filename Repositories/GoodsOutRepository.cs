@@ -85,7 +85,7 @@ namespace StoreBack.Repositories
 
 
 
-                    public async Task<PagedResult<GetGoodsOutViewModel>> getGoodsOut(int OrganizationId, int? branchId, int pageNumber = 1, int pageSize = 5, string quantityOperator = null, float? quantityValue = null, DateTime? dateFrom = null, DateTime? dateTo = null)
+                    public async Task<PagedResult<GetGoodsOutViewModel>> getGoodsOut(int OrganizationId, int? branchId = null, int pageNumber = 1, int pageSize = 5, string quantityOperator = null, float? quantityValue = null, DateTime? dateFrom = null, DateTime? dateTo = null)
             {
                 List<GetGoodsOutViewModel> goodsOutList = new List<GetGoodsOutViewModel>();
                 int totalCount = 0;

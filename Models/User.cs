@@ -14,8 +14,10 @@ namespace StoreBack.Models {
         [ForeignKey("Organization")]
         public int OrganizationId { get; set; }
 
-        [Required]
+         [Required]
+        [MaxLength(255)]
         public string Email { get; set; }
+
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string Username { get; set; }
