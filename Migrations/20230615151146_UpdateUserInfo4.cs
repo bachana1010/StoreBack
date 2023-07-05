@@ -4,10 +4,8 @@
 
 namespace StoreBack.Migrations
 {
-    /// <inheritdoc />
     public partial class UpdateUserInfo4 : Migration
     {
-        /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.Sql(@"

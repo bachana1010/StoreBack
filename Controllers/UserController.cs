@@ -79,10 +79,10 @@ namespace StoreBack.Controllers
                 return Unauthorized("You do not have permission to update this resource");
             }
 
-            if (!string.IsNullOrEmpty(model.Password))
-            {
-                model.Password = BC.HashPassword(model.Password);
-            }
+            // if (!string.IsNullOrEmpty(model.Password))
+            // {
+            //     model.Password = BC.HashPassword(model.Password);
+            // }
 
             try
             {
