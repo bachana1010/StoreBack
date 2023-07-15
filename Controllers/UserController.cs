@@ -30,10 +30,10 @@ namespace StoreBack.Controllers
             _userRepository = userRepository;
             _jwtSettings = jwtSettings.Value;
         }
+        
 
-        //user-is sheqmna
-
-        [HttpPost("")]
+        //create user
+       [HttpPost("")]
         [Authorize]
         [Role("administrator")]
         public async Task<IActionResult> CreateUser([FromBody] AddUserViewModel model)
@@ -47,6 +47,13 @@ namespace StoreBack.Controllers
 
             var user = _userRepository.getUser(authUserId);
 
+            // Check if a user with the same email already exists
+            var existingUser = _userRepository.getUserByEmail(model.Email);
+            if (existingUser != null)
+            {
+                return BadRequest(new { error = "User already exists." });
+            }
+
             try
             {
                 int userId = await _userRepository.AddUser(model, user);
@@ -58,6 +65,7 @@ namespace StoreBack.Controllers
                 return BadRequest(new { error = e.Message });
             }
         }
+
 
         //user-is update
 
@@ -74,10 +82,10 @@ namespace StoreBack.Controllers
             }
 
            
-            if(authUserId == id)
-            {
-                return Unauthorized("You do not have permission to update this resource");
-            }
+            // if(authUserId == id)
+            // {
+            //     return Unauthorized("You do not have permission to update this resource");
+            // }
 
             // if (!string.IsNullOrEmpty(model.Password))
             // {
@@ -127,7 +135,7 @@ namespace StoreBack.Controllers
 
             await _userRepository.DeleteUser(id);
 
-            return Ok();
+                return Ok(new { message = "User Deleted successfully." });
         }
 
 

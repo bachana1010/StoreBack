@@ -19,6 +19,8 @@ namespace StoreBack.Repositories
         Task DeleteUser(int id);
         Task UpdateUser(int id, UpdateserViewModel model);
         Task<PagedResult<User>> GetUsers(UserFilterViewModel filter , int OrganizationId, int pageNumber = 1, int pageSize = 5);
+        User getUserByEmail(string email);
+
     }
     
     public class UserRepository : IUserRepository
@@ -209,5 +211,62 @@ namespace StoreBack.Repositories
 
                 return new PagedResult<User> { Results = users, TotalCount = totalCount };
             }
+
+
+            //getuserbyemail
+            public User getUserByEmail(string email)
+            {
+                using (SqlConnection conn = new SqlConnection(connection))
+                {
+                    conn.Open();
+                    SqlCommand cmd = new SqlCommand();
+                    cmd.Connection = conn;
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.CommandText = "GetUserByEmail";
+
+                    cmd.Parameters.Add("@Email", SqlDbType.NVarChar).Value = email;
+
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            User user = new User
+                            {
+                                Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                                Email = reader.GetString(reader.GetOrdinal("Email")),
+                                FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
+                                LastName = reader.GetString(reader.GetOrdinal("LastName")),
+                                Username = reader.GetString(reader.GetOrdinal("Username")),
+                                PasswordHash = reader.GetString(reader.GetOrdinal("PasswordHash")),
+                                Role = reader.GetString(reader.GetOrdinal("Role")),
+                                OrganizationId = reader.GetInt32(reader.GetOrdinal("OrganizationId")),
+                                BranchId = reader.IsDBNull(reader.GetOrdinal("BranchId")) ? 
+                                    (int?)null : 
+                                    reader.GetInt32(reader.GetOrdinal("BranchId"))
+                            };
+
+                            return user;
+                        }
+                        else
+                        {
+                            return null; 
+                        }
+                    }
+                }
+            }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
                 }
             }

@@ -33,37 +33,37 @@ namespace StoreBack.Controllers
 
 
 
-        //goodsoutis damateba
-        [HttpPost("")]
-        [Authorize]
-        [Role("operator")]
-        public async Task<IActionResult> AddGoodsOut([FromBody] MakeGoodsOutViewModel model)
-        {
-            var authUserIdString = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
-
-            if (!int.TryParse(authUserIdString, out int authUserId))
+            //goodsoutis damateba
+            [HttpPost("")]
+            [Authorize]
+            [Role("operator")]
+            public async Task<IActionResult> AddGoodsOut([FromBody] MakeGoodsOutViewModel model)
             {
-                return BadRequest("Invalid user ID");
-            }
+                var authUserIdString = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
 
-            var user = _userRepository.getUser(authUserId);
+                if (!int.TryParse(authUserIdString, out int authUserId))
+                {
+                    return BadRequest("Invalid user ID");
+                }
 
-            if (user == null)
-            {
-                return NotFound("User not found");
-            }
+                var user = _userRepository.getUser(authUserId);
 
-            try
-            {
-                int goodsOutId = await _GoodsOutRepository.MakeGoodsOut(model, user);
+                if (user == null)
+                {
+                    return NotFound("User not found");
+                }
 
-                return Ok(new { message = "Goods out operation was successful.", goodsOutId = goodsOutId });
+                try
+                {
+                    int goodsOutId = await _GoodsOutRepository.MakeGoodsOut(model, user);
+
+                    return Ok(new { message = "Goods out operation was successful.", goodsOutId = goodsOutId });
+                }
+                catch (Exception e)
+                {
+                    return BadRequest(new { error = e.Message });
+                }
             }
-            catch (Exception e)
-            {
-                return BadRequest(new { error = e.Message });
-            }
-        }
 
 
            //getGoodOut

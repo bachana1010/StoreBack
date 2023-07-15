@@ -52,7 +52,7 @@ namespace StoreBack.Controllers
             {
                 await _branchRepository.addBranch(model, user );
 
-                return Ok(new { message = "User created successfully." });
+                return Ok(new { message = "Branch created successfully." });
             }
             catch(Exception e)
             {
@@ -99,7 +99,7 @@ namespace StoreBack.Controllers
             // delete  branch
             await _branchRepository.DeleteBranch(BranchId);
 
-            return Ok();
+                return Ok(new { message = "Branch Deleted successfully." });
         }
 
 
@@ -179,7 +179,7 @@ namespace StoreBack.Controllers
 
                 if(true)
                 {
-                    return Ok(new { message = "User updated successfully." });
+                    return Ok(new { message = "Branch updated successfully." });
                 }
                 else
                 {

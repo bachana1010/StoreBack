@@ -174,23 +174,23 @@ namespace StoreBack.Repositories
             }
 
 
-        public async Task UpdateBranch(int id,UpdateBranchViewModel model)
-        {
-            using (SqlConnection conn = new SqlConnection(connection))
+            public async Task UpdateBranch(int id,UpdateBranchViewModel model)
             {
-                conn.Open();
-                SqlCommand cmd = new SqlCommand();
-                cmd.Connection = conn;
-                cmd.CommandType = CommandType.StoredProcedure;
-                cmd.CommandText = "UpdateBranchInfo";
+                using (SqlConnection conn = new SqlConnection(connection))
+                {
+                    conn.Open();
+                    SqlCommand cmd = new SqlCommand();
+                    cmd.Connection = conn;
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.CommandText = "UpdateBranchInfo";
 
-                cmd.Parameters.Add("@Id", SqlDbType.Int).Value = id;
-                cmd.Parameters.Add("@BrancheName", SqlDbType.NVarChar).Value = model.BranchName;
+                    cmd.Parameters.Add("@Id", SqlDbType.Int).Value = id;
+                    cmd.Parameters.Add("@BrancheName", SqlDbType.NVarChar).Value = model.BranchName;
 
-                await cmd.ExecuteNonQueryAsync();
+                    await cmd.ExecuteNonQueryAsync();
 
 
+                }
             }
-        }
     }
 }

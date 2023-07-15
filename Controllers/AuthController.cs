@@ -31,23 +31,23 @@ namespace StoreBack.Controllers
 
 
     //registratia
-    [HttpPost("register")]
-    public async Task<IActionResult> RegisterUser([FromBody] RegisterOrganizationViewModel model)
-    {
-        try
+        [HttpPost("register")]
+        public async Task<IActionResult> RegisterUser([FromBody] RegisterOrganizationViewModel model)
         {
-            // password-is heshireba
-            model.Password = BC.HashPassword(model.Password);
+            try
+            {
+                // password-is heshireba
+                model.Password = BC.HashPassword(model.Password);
 
-            var userId = await _authRepository.RegisterOrganizationAndUser(model);
+                var userId = await _authRepository.RegisterOrganizationAndUser(model);
 
-            return Ok(new { message = "User registered successfully.", userId = userId });
+                return Ok(new { message = "User registered successfully.", userId = userId });
+            }
+            catch(Exception e)
+            {
+                return BadRequest(new { error = e.Message });
+            }
         }
-        catch(Exception e)
-        {
-            return BadRequest(new { error = e.Message });
-        }
-    }
 
     //dalogineba
      
