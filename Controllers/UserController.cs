@@ -81,16 +81,7 @@ namespace StoreBack.Controllers
                 return BadRequest("Invalid user ID");
             }
 
-           
-            // if(authUserId == id)
-            // {
-            //     return Unauthorized("You do not have permission to update this resource");
-            // }
-
-            // if (!string.IsNullOrEmpty(model.Password))
-            // {
-            //     model.Password = BC.HashPassword(model.Password);
-            // }
+        
 
             try
             {

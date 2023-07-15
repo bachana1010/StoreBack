@@ -14,7 +14,7 @@ namespace StoreBack.Repositories
     {
       
         Task<int> MakeGoodsIn(MakeGoodsInViewModel model, User user);
-        GetBarcodeViewModel getBarcode(string  barcodetext);
+        GetBarcodeViewModel getBarcode(string  barcodetext,int branchId);
         Task<PagedResult<GetGoodsinViewModel>> GetGoodsIn(int organizationId, int? branchId = null, string quantityOperator = null, decimal? quantityValue = null, DateTime? dateFrom = null, DateTime? dateTo = null, int pageNumber = 1, int pageSize = 5);
 
     }
@@ -60,8 +60,7 @@ namespace StoreBack.Repositories
     }
 
         //getbarcode
-
-        public GetBarcodeViewModel getBarcode(string  barcodetext)
+        public GetBarcodeViewModel getBarcode(string barcodetext, int branchId) 
         {
             using (SqlConnection conn = new SqlConnection(connection))
             {
@@ -72,36 +71,31 @@ namespace StoreBack.Repositories
                 cmd.CommandText = "getBarcode";
 
                 cmd.Parameters.Add("@barcodetext", SqlDbType.NVarChar).Value = barcodetext;
+                cmd.Parameters.Add("@branchId", SqlDbType.Int).Value = branchId;  // Added this line
 
                 using (SqlDataReader reader = cmd.ExecuteReader())
                 {
                     if (reader.Read())
                     {
                         GetBarcodeViewModel barcodeVM = new GetBarcodeViewModel
-
-                       {
-                        Barcode = reader.GetString(reader.GetOrdinal("Barcode")),
-                        Name = reader.GetString(reader.GetOrdinal("Name")),
-                        Price = reader.GetFloat(reader.GetOrdinal("Price")),
-                        Unit = reader.GetString(reader.GetOrdinal("Unit")),
-                        BranchId = reader.GetInt32(reader.GetOrdinal("BranchId")),
-                        OrganizationId = reader.GetInt32(reader.GetOrdinal("OrganizationId")),
-                        Quantity = reader.GetFloat(reader.GetOrdinal("Quantity")) 
-
+                        {
+                            Barcode = reader.GetString(reader.GetOrdinal("Barcode")),
+                            Name = reader.GetString(reader.GetOrdinal("Name")),
+                            Price = reader.GetFloat(reader.GetOrdinal("Price")),
+                            Unit = reader.GetString(reader.GetOrdinal("Unit")),
+                            BranchId = reader.GetInt32(reader.GetOrdinal("BranchId")),
+                            OrganizationId = reader.GetInt32(reader.GetOrdinal("OrganizationId")),
+                            Quantity = reader.GetFloat(reader.GetOrdinal("Quantity")) 
                         };
 
                         return barcodeVM;
-
                     }
                     else
                     {
                         return null; 
                     }
                 }
-
-                
-            }
-            
+            }            
         }
 
 

@@ -12,8 +12,8 @@ using StoreBack;
 namespace StoreBack.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20230715105905_getuserbyemail")]
-    partial class getuserbyemail
+    [Migration("20230715191901_GetBarcode6")]
+    partial class GetBarcode6
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

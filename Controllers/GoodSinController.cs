@@ -70,8 +70,7 @@ namespace StoreBack.Controllers
 
 
 
-        //getbarcodes
-
+        //getbarcode
         [HttpGet("{barcodetext}")]
         [Authorize]
         [Role("operator")]
@@ -82,7 +81,19 @@ namespace StoreBack.Controllers
                 return BadRequest("Invalid barcode text");
             }
 
-            var barcode = _GoodsinRepository.getBarcode(barcodetext);
+            var authUserIdString = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+            if (!int.TryParse(authUserIdString, out int authUserId))
+            {
+                return BadRequest("Invalid user ID");
+            }
+
+            var user = _userRepository.getUser(authUserId);
+            if(user == null || user.BranchId == null)
+            {
+                return BadRequest("User not found or has no assigned branch");
+            }
+
+            var barcode = _GoodsinRepository.getBarcode(barcodetext, user.BranchId.Value); 
 
             if (barcode == null)
             {
@@ -91,6 +102,7 @@ namespace StoreBack.Controllers
 
             return Ok(barcode);
         }
+
 
 
        //getGoodsin
@@ -137,13 +149,5 @@ namespace StoreBack.Controllers
                 return StatusCode(500, e.Message);
             }
         }
-
-
-
-
-
-
-
-
     }
 }

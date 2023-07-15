@@ -21,7 +21,6 @@ namespace StoreBack.Controllers
     [Authorize]
     public class BranchController : ControllerBase
     {
-
         private readonly IUserRepository _userRepository;
         private readonly IBranchRepository _branchRepository;
     
@@ -30,9 +29,6 @@ namespace StoreBack.Controllers
             _branchRepository= BranchRepository;
             _userRepository = userRepository;
         }
-
-
-        //add branch
 
         [HttpPost("")]
         [Role("administrator")]
@@ -88,8 +84,6 @@ namespace StoreBack.Controllers
             {
                 return NotFound("Branch not found");
             }
-
-
             
             if (authUser.OrganizationId != branch.OrganizationId)
             {
@@ -110,8 +104,7 @@ namespace StoreBack.Controllers
         [Role("administrator")]
         public async Task<IActionResult> GetBranches([FromQuery] string? BrancheName, [FromQuery] string? Username, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 5)
         {
-
-                var authUserIdString = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+            var authUserIdString = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
 
             if (!int.TryParse(authUserIdString, out int authUserId))
             {
@@ -130,13 +123,6 @@ namespace StoreBack.Controllers
             });
         }
 
-
-
-
-
-        //get branche by id
-
-
         [HttpGet("{Id}")]
         [Authorize]
         [Role("administrator")]
@@ -149,8 +135,7 @@ namespace StoreBack.Controllers
                 return BadRequest("Invalid user ID");
             }
 
-
-             var branch = _branchRepository.GetBranch(Id);
+            var branch = _branchRepository.GetBranch(Id);
 
             return Ok(branch);
         }
@@ -170,8 +155,8 @@ namespace StoreBack.Controllers
                 return BadRequest("Invalid user ID");
             }
 
-              //branchis amogeba GetBranch - it
-              var branch = _branchRepository.GetBranch(id);
+            //branchis amogeba GetBranch - it
+            var branch = _branchRepository.GetBranch(id);
 
             try
             {
@@ -191,9 +176,5 @@ namespace StoreBack.Controllers
                 return BadRequest(new { error = e.Message });
             }
         }
-
-
-
-
     }
 }
